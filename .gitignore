@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2024 Julien Lambé <julien@themosis.com>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+.DS_Store
+.idea
+.phpunit.cache
+.php-cs-fixer.cache
+composer.lock
+/vendor
+/node_modules

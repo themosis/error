@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Themosis\Components\Error\Backtrace;
+
+use Stringable;
+
+final class File implements Stringable {
+	private ?string $filepath;
+	private int $line;
+
+	public function __construct(
+		?string $filepath,
+		?int $line,
+	) {
+		$this->filepath = $filepath;
+		$this->line     = $line ?? 1;
+	}
+
+	public function __toString(): string {
+		if ( null === $this->filepath ) {
+			return '';
+		}
+
+		return sprintf( '%s:%d', $this->filepath, $this->line );
+	}
+}

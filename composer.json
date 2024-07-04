@@ -1,0 +1,41 @@
+{
+    "name": "themosis/error",
+    "description": "The Themosis error component.",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Julien",
+            "email": "julien@themosis.com"
+        }
+    ],
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Themosis\\Components\\Error\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Themosis\\Components\\Error\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [],
+    "require": {
+        "php": "^8.2",
+        "psr/log": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.1"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "fix": "tools/phpcs/vendor/bin/phpcbf",
+        "sniff": "tools/phpcs/vendor/bin/phpcs",
+        "analyze": "tools/phpstan/vendor/bin/phpstan analyze"
+    },
+    "suggest": {
+        "themosis/log": "Themosis component to help you manage PSR-3 compliant loggers."
+    }
+}

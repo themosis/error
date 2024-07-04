@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<!--
+SPDX-FileCopyrightText: 2024 Julien Lambé <julien@themosis.com>
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
+<ruleset name="Themosis Error Component">
+    <!-- Files -->
+    <file>./src</file>
+    <file>./tests</file>
+
+    <!-- Code Rules -->
+    <rule ref="Themosis"/>
+</ruleset>
+
