@@ -11,12 +11,14 @@ final class Backtrace {
 	private array $frames = [];
 
 	public function __construct(
-		private FrameTags $tags,
+		private FrameIdentifiers $frame_identifiers,
 	) {
 	}
 
-	public function capture( array $frames ): void {
+	public function capture( array $frames ): self {
 		$this->frames = array_map( $this->add_frame( ... ), $frames );
+
+		return $this;
 	}
 
 	public function frames(): array {
@@ -25,7 +27,7 @@ final class Backtrace {
 
 	public function filter( callable $filter_callback ): self {
 		$filtered_backtrace = new self(
-			tags: $this->tags,
+			frame_identifiers: $this->frame_identifiers,
 		);
 
 		$filtered_frames = array_map( fn ( Frame $frame ) => $frame->as_array(), array_filter( $this->frames, $filter_callback ) );
@@ -37,7 +39,14 @@ final class Backtrace {
 	private function add_frame( array $frame_args ): Frame {
 		$frame = new Frame( $frame_args );
 
-		$this->tags->find( $frame );
+		$applicable_identifiers = array_filter(
+			$this->frame_identifiers->all(),
+			function ( FrameIdentifier $frame_identifier ) use ( $frame ) {
+				return $frame_identifier->identify( $frame );
+			}
+		);
+
+		$frame->add_tag( ...array_map( fn ( FrameIdentifier $frame_identifier ) => $frame_identifier->tag(), $applicable_identifiers ) );
 
 		return $frame;
 	}

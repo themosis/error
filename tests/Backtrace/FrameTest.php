@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Themosis\Components\Error\Tests\Backtrace;
 
 use PHPUnit\Framework\Attributes\Test;
+use Themosis\Components\Error\Backtrace\AppFrameTag;
+use Themosis\Components\Error\Backtrace\CustomFrameTag;
 use Themosis\Components\Error\Backtrace\Frame;
-use Themosis\Components\Error\Backtrace\FrameTag;
+use Themosis\Components\Error\Backtrace\VendorFrameIdentifier;
+use Themosis\Components\Error\Backtrace\VendorFrameTag;
 use Themosis\Components\Error\Tests\TestCase;
 
 final class FrameTest extends TestCase {
@@ -61,21 +64,21 @@ final class FrameTest extends TestCase {
 		$frame = new Frame( $data );
 
 		$frame->add_tag(
-			new FrameTag(
+			new CustomFrameTag(
 				slug: 'vendor',
 				name: 'PHP Vendor',
 			)
 		);
 
 		$frame->add_tag(
-			new FrameTag(
+			new CustomFrameTag(
 				slug: 'themosis',
 				name: 'Themosis Component',
 			)
 		);
 
 		$frame->add_tag(
-			new FrameTag(
+			new CustomFrameTag(
 				slug: 'test',
 				name: 'Unit Test',
 			)
@@ -90,24 +93,59 @@ final class FrameTest extends TestCase {
 
 		$frame = new Frame( $data );
 
-		$frame->add_tag(
-			$first_tag = new FrameTag(
-				slug: 'vendor',
-				name: 'Vendor',
-			)
+		$first_tag = new CustomFrameTag(
+			slug: 'vendor',
+			name: 'Vendor',
 		);
 
-		$frame->add_tag(
-			$last_tag = new FrameTag(
-				slug: 'vendor',
-				name: 'Third-Party Package',
-			),
+		$frame->add_tag( $first_tag );
+
+		$last_tag = new CustomFrameTag(
+			slug: 'vendor',
+			name: 'Third-Party Package',
 		);
+
+		$frame->add_tag( $last_tag );
 
 		$this->assertCount( 1, $frame->tags() );
 		$this->assertSame(
 			$last_tag->name(),
 			$frame->tags()[ $first_tag->slug() ]->name(),
 		);
+	}
+
+	#[Test]
+	public function it_can_identify_a_frame_using_tag(): void {
+		$data = FramesProvider::class_with_static_method();
+
+		$frame = new Frame( $data );
+
+		$app_tag = new AppFrameTag();
+
+		$frame->add_tag( $app_tag );
+
+		$package_tag = new VendorFrameTag();
+
+		$frame->add_tag( $package_tag );
+
+		$this->assertTrue( $frame->is( $app_tag ) );
+		$this->assertTrue( $frame->is( new CustomFrameTag( slug: 'app', name: 'Application' ) ) );
+		$this->assertFalse( $frame->is( new CustomFrameTag( slug: 'app', name: 'App' ) ) );
+
+		$this->assertTrue( $frame->is( $package_tag ) );
+		$this->assertFalse( $frame->is( new CustomFrameTag( slug: 'vendor', name: 'Package' ) ) );
+	}
+
+	#[Test]
+	public function it_can_identify_a_vendor_frame(): void {
+		$data = FramesProvider::vendor_class_with_instance_method();
+
+		$frame = new Frame( $data );
+
+		$identifier = new VendorFrameIdentifier(
+			project_root_path: '/disk/web/project',
+		);
+
+		$this->assertTrue( $identifier->identify( $frame ) );
 	}
 }

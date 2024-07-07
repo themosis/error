@@ -43,12 +43,18 @@ final class Frame implements Stringable, IteratorAggregate {
 		$this->args   = $frame['args'] ?? [];
 	}
 
-	public function add_tag( FrameTag $tag ): void {
-		$this->tags[ $tag->slug() ] = $tag;
+	public function add_tag( FrameTag ...$tags ): void {
+		foreach ( $tags as $tag ) {
+			$this->tags[ $tag->slug() ] = $tag;
+		}
 	}
 
 	public function tags(): array {
 		return $this->tags;
+	}
+
+	public function is( FrameTag $tag ): bool {
+		return isset( $this->tags[ $tag->slug() ] ) && $tag->equals( $this->tags[ $tag->slug() ] );
 	}
 
 	public function getIterator(): Traversable {

@@ -36,4 +36,14 @@ final class FramesProvider {
 			'function' => 'include',
 		];
 	}
+
+	public static function vendor_class_with_instance_method(): array {
+		return [
+			'file'     => '/disk/web/project/vendor/third-party/some-package/Runner.php',
+			'line'     => 79,
+			'function' => 'run',
+			'class'    => 'ThirdParty\SomePackage\Runner',
+			'type'     => '->',
+		];
+	}
 }
