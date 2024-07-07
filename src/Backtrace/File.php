@@ -18,6 +18,10 @@ final class File implements Stringable {
 		$this->line     = $line ?? 1;
 	}
 
+	public function path(): string {
+		return $this->filepath ?? '';
+	}
+
 	public function __toString(): string {
 		if ( null === $this->filepath ) {
 			return '';

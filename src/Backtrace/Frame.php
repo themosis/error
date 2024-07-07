@@ -4,15 +4,26 @@ declare(strict_types=1);
 
 namespace Themosis\Components\Error\Backtrace;
 
+use ArrayIterator;
+use IteratorAggregate;
 use Stringable;
+use Traversable;
 
-final class Frame implements Stringable {
+final class Frame implements Stringable, IteratorAggregate {
+	private array $raw_frame;
 	private FrameFunction $function;
 	private File $file;
 	private ?object $object;
 	private array $args;
 
+	/**
+	 * @var array<string, FrameTag>
+	 */
+	private array $tags = [];
+
 	public function __construct( array $frame ) {
+		$this->raw_frame = $frame;
+
 		$this->file = new File(
 			filepath: $frame['file'] ?? null,
 			line: $frame['line'] ?? null,
@@ -32,6 +43,18 @@ final class Frame implements Stringable {
 		$this->args   = $frame['args'] ?? [];
 	}
 
+	public function add_tag( FrameTag $tag ): void {
+		$this->tags[ $tag->slug() ] = $tag;
+	}
+
+	public function tags(): array {
+		return $this->tags;
+	}
+
+	public function getIterator(): Traversable {
+		return new ArrayIterator( $this->raw_frame );
+	}
+
 	public function get_function(): FrameFunction {
 		return $this->function;
 	}
@@ -46,6 +69,10 @@ final class Frame implements Stringable {
 
 	public function get_args(): array {
 		return $this->args;
+	}
+
+	public function as_array(): array {
+		return $this->raw_frame;
 	}
 
 	public function __toString(): string {

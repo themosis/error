@@ -16,6 +16,16 @@ final class FramesProvider {
 		];
 	}
 
+	public static function class_with_instance_method(): array {
+		return [
+			'file'     => '/disk/web/project/app/Foo.php',
+			'line'     => 18,
+			'function' => 'bar',
+			'class'    => 'App\Foo',
+			'type'     => '->',
+		];
+	}
+
 	public static function file_with_include(): array {
 		return [
 			'file'     => '/disk/web/project/app/config.php',

@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Themosis\Components\Error\Backtrace;
 
-final class ClassFunction implements FrameFunction {
+final class ClassFunction implements FrameClassFunction {
 	public function __construct(
 		private string $class_name,
 		private string $function_name,
 		private string $type,
 	) {
+	}
+
+	public function get_class(): string {
+		return $this->class_name;
 	}
 
 	public function __toString(): string {
