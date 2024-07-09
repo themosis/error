@@ -6,7 +6,7 @@ namespace Themosis\Components\Error\Tests\Backtrace;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Themosis\Components\Error\Backtrace\FrameTag;
+use Themosis\Components\Error\Backtrace\CustomFrameTag;
 use Themosis\Components\Error\Exceptions\InvalidFrameTagArgument;
 use Themosis\Components\Error\Tests\TestCase;
 
@@ -16,7 +16,7 @@ final class FrameTagTest extends TestCase {
 	public function it_can_not_create_a_frame_tag_with_invalid_arguments( string $slug, string $name ): void {
 		$this->expectException( InvalidFrameTagArgument::class );
 
-		new FrameTag(
+		new CustomFrameTag(
 			slug: $slug,
 			name: $name,
 		);
