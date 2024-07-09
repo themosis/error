@@ -22,8 +22,12 @@ final class Backtrace implements Stringable {
 			frame_identifiers: $frame_identifiers ?? new InMemoryFrameIdentifiers(),
 		);
 
+		$debug_backtrace_without_first_frame = ( static function ( array $frames ): array {
+			return array_slice( $frames, 1 );
+		} )( debug_backtrace() );
+
 		return $self->capture(
-			frames: array_slice( debug_backtrace( options: DEBUG_BACKTRACE_PROVIDE_OBJECT ), 1 ),
+			frames: $debug_backtrace_without_first_frame,
 		);
 	}
 
