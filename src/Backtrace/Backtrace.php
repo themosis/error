@@ -28,7 +28,7 @@ final class Backtrace implements Stringable {
 	}
 
 	public function capture( array $frames ): self {
-		$this->frames = array_map( $this->add_frame( ... ), $frames );
+		$this->frames = array_map( $this->make_frame( ... ), $frames );
 
 		return $this;
 	}
@@ -48,7 +48,7 @@ final class Backtrace implements Stringable {
 		return $filtered_backtrace;
 	}
 
-	private function add_frame( array $frame_args ): Frame {
+	private function make_frame( array $frame_args ): Frame {
 		$frame = new Frame( $frame_args );
 
 		$applicable_identifiers = array_filter(
