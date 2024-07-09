@@ -89,16 +89,4 @@ final class Frame implements Stringable, IteratorAggregate {
 
 		return implode( ' ', $elements );
 	}
-
-	/**
-	 * This should be replaced by the "FrameTypes" mechanism...
-	 * in order to let developer describe which frames to identify...
-	 */
-	public function is_php_core(): bool {
-		return false;
-	}
-
-	public function is_wordpress(): bool {
-		return false;
-	}
 }
