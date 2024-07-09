@@ -110,4 +110,43 @@ final class BacktraceTest extends TestCase {
 		$this->assertCount( 1, $second_frame->tags() );
 		$this->assertTrue( $second_frame->is( new VendorFrameTag() ) );
 	}
+
+	#[Test]
+	public function it_can_render_a_backtrace_with_var_dump(): void {
+		$identifiers = new InMemoryFrameIdentifiers();
+
+		$backtrace = new Backtrace(
+			frame_identifiers: $identifiers,
+		);
+
+		$backtrace->capture( debug_backtrace() );
+
+		ob_start();
+
+		var_dump( $backtrace );
+
+		$output = ob_get_clean();
+
+		$first_frame = $backtrace->frames()[0];
+
+		$this->assertStringContainsString( (string) $first_frame, $output );
+	}
+
+	#[Test]
+	public function it_can_generate_a_debug_backtrace_using_debug_named_constructor(): void {
+		$backtrace = new Backtrace(
+			frame_identifiers: new InMemoryFrameIdentifiers(),
+		);
+
+		$backtrace->capture( debug_backtrace() );
+
+		$first_frame_backtrace = $backtrace->frames()[0];
+
+		$debug_backtrace = Backtrace::debug();
+
+		$first_frame_debug_backtrace = $debug_backtrace->frames()[0];
+
+		$this->assertSame( (string) $first_frame_backtrace, (string) $first_frame_debug_backtrace );
+		$this->assertSame( (string) $backtrace, (string) $debug_backtrace );
+	}
 }

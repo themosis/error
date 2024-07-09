@@ -42,7 +42,6 @@ final class ErrorHandler {
 
 	public function restore(): void {
 		restore_error_handler();
-
 		restore_exception_handler();
 	}
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Themosis\Components\Error\Backtrace;
 
-final class Backtrace {
+use Stringable;
+
+final class Backtrace implements Stringable {
 	/**
 	 * @var array<int, Frame>
 	 */
@@ -13,6 +15,16 @@ final class Backtrace {
 	public function __construct(
 		private FrameIdentifiers $frame_identifiers,
 	) {
+	}
+
+	public static function debug( FrameIdentifiers $frame_identifiers = null ): self {
+		$self = new self(
+			frame_identifiers: $frame_identifiers ?? new InMemoryFrameIdentifiers(),
+		);
+
+		return $self->capture(
+			frames: array_slice( debug_backtrace( options: DEBUG_BACKTRACE_PROVIDE_OBJECT ), 1 ),
+		);
 	}
 
 	public function capture( array $frames ): self {
@@ -49,5 +61,27 @@ final class Backtrace {
 		$frame->add_tag( ...array_map( fn ( FrameIdentifier $frame_identifier ) => $frame_identifier->tag(), $applicable_identifiers ) );
 
 		return $frame;
+	}
+
+	public function __toString(): string {
+		return implode(
+			PHP_EOL,
+			array_map(
+				function ( Frame $frame, int $index ) {
+					return sprintf( '[%d] %s', $index, (string) $frame );
+				},
+				$this->frames,
+				array_keys( $this->frames )
+			)
+		);
+	}
+
+	public function __debugInfo() {
+		return array_map(
+			function ( Frame $frame ) {
+				return (string) $frame;
+			},
+			$this->frames,
+		);
 	}
 }
