@@ -13,8 +13,16 @@ final class ErrorHandler {
 	) {
 	}
 
-	public function capture(): void {
-		set_error_handler( $this->handle_error( ... ), E_ALL );
+    public function capture( Throwable $exception ): void
+    {
+        // Capturing the exception... but I don't want to pass it to "all" reporters immediately.
+        // If developer has manually captured the exception, it seems that the script is still ongoing...
+        // So, perhaps we want to stack captured exceptions, and only once the script execution is finishing, we will release and report them all...
+    }
+
+	public function register(): void {
+		$previous = set_error_handler( $this->handle_error( ... ), E_ALL );
+        //var_dump($previous);
 		set_exception_handler( $this->handle_exception( ... ) );
 	}
 
