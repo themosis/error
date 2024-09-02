@@ -1,17 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Themosis\Components\Error;
 
-final class InMemoryReporters implements Reporters
-{
-    public function add(ReporterKey $key, Reporter $reporter): void { }
+final class InMemoryReporters implements Reporters {
+	/**
+	 * @var array<int, Reporter>
+	 */
+	private array $reporters = [];
 
-    public function find(ReporterKey $key): Reporter {
-        return new class() implements Reporter {
-            public function report(): void
-            {
-                
-            }
-        };
-    }
+	public function add( Reporter $reporter ): void {
+		$this->reporters[] = $reporter;
+	}
+
+	/**
+	 * @return array<int, Reporter>
+	 */
+	public function all(): array {
+		return $this->reporters;
+	}
 }
