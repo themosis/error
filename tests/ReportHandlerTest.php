@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\Test;
 use Themosis\Components\Error\Backtrace\Backtrace;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\InMemoryReporters;
+use Themosis\Components\Error\Issue;
+use Themosis\Components\Error\Reporters\CallbackReporter;
 use Themosis\Components\Error\Reporters\LogReporter;
 use Themosis\Components\Error\Reporters\StdoutReporter;
 use Themosis\Components\Error\ReportHandler;
@@ -186,5 +188,35 @@ final class ReportHandlerTest extends TestCase {
 
 		$this->assertCount( 2, array_shift( $matches_a ) );
 		$this->assertCount( 2, array_shift( $matches_b ) );
+	}
+
+	#[Test]
+	public function it_can_report_an_issue_using_a_closure(): void {
+		$reported         = false;
+		$reported_message = '';
+
+		$reporters = new InMemoryReporters();
+		$reporters->add(
+			reporter: new CallbackReporter(
+				static function ( Issue $issue ) use ( &$reported, &$reported_message ) {
+					$reported         = true;
+					$reported_message = $issue->message();
+				}
+			)
+		);
+
+		$handler = new ReportHandler(
+			reporters: $reporters,
+		);
+
+		$handler->report( exception: new Exception( 'Oops!' ) );
+
+		$this->assertFalse( $reported );
+		$this->assertEmpty( $reported_message );
+
+		$handler->release();
+
+		$this->assertTrue( $reported );
+		$this->assertSame( 'Oops!', $reported_message );
 	}
 }
