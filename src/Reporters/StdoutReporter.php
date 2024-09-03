@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Themosis\Components\Error\Reporters;
 
 use Themosis\Components\Error\Backtrace\Backtrace;

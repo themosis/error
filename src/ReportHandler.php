@@ -23,10 +23,22 @@ final class ReportHandler {
 	}
 
 	public function release(): void {
-		foreach ( $this->captured_issues as $issue ) {
-			foreach ( $this->reporters->all() as $reporter ) {
-				$reporter->report( $issue );
-			}
-		}
+		$call_reporters_on_captured_issues = static function ( array $issues ) {
+			return static function ( array $reporters ) use ( $issues ) {
+				array_map(
+					static function ( Issue $issue ) use ( $reporters ) {
+						array_map(
+							static function ( Reporter $reporter ) use ( $issue ) {
+								$reporter->report( $issue );
+							},
+							$reporters
+						);
+					},
+					$issues
+				);
+			};
+		};
+
+		$call_reporters_on_captured_issues( $this->captured_issues )( $this->reporters->all() );
 	}
 }
