@@ -13,13 +13,13 @@ final class StdoutReporter implements Reporter {
 	}
 
 	public function report( Issue $issue ): void {
-        $backtrace = $this->backtrace->capture_exception( $issue->exception() );
+		$backtrace = $this->backtrace->capture_exception( $issue->exception() );
 
-        printf(
-            "[%s] %s\n%s\n",
-            $issue->date(),
-            $issue->message(),
-            (string) $backtrace
-        );
+		printf(
+			"[%s] %s\n%s\n",
+			$issue->date(),
+			$issue->message(),
+			(string) $backtrace
+		);
 	}
 }

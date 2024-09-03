@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Themosis\Components\Error\Backtrace;
 
 use Stringable;
+use Throwable;
 
 final class Backtrace implements Stringable {
 	/**
@@ -14,8 +15,7 @@ final class Backtrace implements Stringable {
 
 	public function __construct(
 		private FrameIdentifiers $frame_identifiers,
-	) {
-	}
+	) {}
 
 	public static function debug( FrameIdentifiers $frame_identifiers = null ): self {
 		$self = new self(
@@ -37,6 +37,12 @@ final class Backtrace implements Stringable {
 		return $this;
 	}
 
+	public function capture_exception( Throwable $exception ): self {
+		return $this->capture(
+			frames: $exception->getTrace(),
+		);
+	}
+
 	public function frames(): array {
 		return $this->frames;
 	}
@@ -46,7 +52,7 @@ final class Backtrace implements Stringable {
 			frame_identifiers: $this->frame_identifiers,
 		);
 
-		$filtered_frames = array_map( fn ( Frame $frame ) => $frame->as_array(), array_filter( $this->frames, $filter_callback ) );
+		$filtered_frames = array_map( fn( Frame $frame ) => $frame->as_array(), array_filter( $this->frames, $filter_callback ) );
 		$filtered_backtrace->capture( $filtered_frames );
 
 		return $filtered_backtrace;
@@ -62,7 +68,7 @@ final class Backtrace implements Stringable {
 			}
 		);
 
-		$frame->add_tag( ...array_map( fn ( FrameIdentifier $frame_identifier ) => $frame_identifier->tag(), $applicable_identifiers ) );
+		$frame->add_tag( ...array_map( fn( FrameIdentifier $frame_identifier ) => $frame_identifier->tag(), $applicable_identifiers ) );
 
 		return $frame;
 	}

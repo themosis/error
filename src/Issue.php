@@ -21,17 +21,31 @@ final class Issue {
 		);
 	}
 
-    public function message(): string
-    {
-        return $this->exception->getMessage();
-    }
-    
-    public function date(string $format = DateTimeImmutable::W3C): string
-    {
-        return $this->occured_at
-            ->with_format( $format )
-            ->as_string();
-    }
+	public function message(): string {
+		return $this->exception->getMessage();
+	}
+
+	public function date( string $format = DateTimeImmutable::W3C ): string {
+		return $this->occured_at
+			->with_format( $format )
+			->as_string();
+	}
+
+	public function level(): Level {
+		if ( $this->exception instanceof Levelable ) {
+			return $this->exception->level();
+		}
+
+		return Level::Error;
+	}
+
+	public function info(): AdditionalInformation {
+		if ( $this->exception instanceof Contextual ) {
+			return $this->exception->context();
+		}
+
+		return new AdditionalInformation();
+	}
 
 	public function exception(): Throwable {
 		return $this->exception;
