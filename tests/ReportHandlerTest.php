@@ -11,6 +11,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\Test;
 use Themosis\Components\Error\Backtrace\Backtrace;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
+use Themosis\Components\Error\InMemoryIssues;
 use Themosis\Components\Error\InMemoryReporters;
 use Themosis\Components\Error\Issue;
 use Themosis\Components\Error\Reporters\CallbackReporter;
@@ -29,13 +30,17 @@ final class ReportHandlerTest extends TestCase {
 			reporter: new StdoutReporter( $backtrace )
 		);
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-		);
-
-		$handler->report(
+		$issue                    = Issue::from_exception(
 			exception: $exception = new Exception( 'There was an error...' ),
 			occured_at: $date     = new DateTimeImmutable( 'now' ),
+		);
+
+		$issues = new InMemoryIssues();
+		$issues->add( $issue );
+
+		$handler = new ReportHandler(
+			reporters: $reporters,
+			issues: $issues,
 		);
 
 		ob_start();
@@ -62,13 +67,17 @@ final class ReportHandlerTest extends TestCase {
 		$reporters->add( reporter: new StdoutReporter( $backtrace ) );
 		$reporters->add( reporter: new StdoutReporter( $backtrace ) );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
+		$issues                       = new InMemoryIssues();
+		$issues->add(
+			issue: Issue::from_exception(
+				exception: $exception = new Exception( 'There was an error...' ),
+				occured_at: $date     = new DateTimeImmutable( 'now' ),
+			),
 		);
 
-		$handler->report(
-			exception: $exception = new Exception( 'There was an error...' ),
-			occured_at: $date     = new DateTimeImmutable( 'now' ),
+		$handler = new ReportHandler(
+			reporters: $reporters,
+			issues: $issues,
 		);
 
 		ob_start();
@@ -93,13 +102,17 @@ final class ReportHandlerTest extends TestCase {
 		$reporters = new InMemoryReporters();
 		$reporters->add( reporter: new LogReporter( $logger ) );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
+		$issues = new InMemoryIssues();
+		$issues->add(
+			issue: Issue::from_exception(
+				exception: new Exception( 'Something went wrong!' ),
+				occured_at: new DateTimeImmutable( 'now' ),
+			),
 		);
 
-		$handler->report(
-			exception: new Exception( 'Something went wrong!' ),
-			occured_at: new DateTimeImmutable( 'now' ),
+		$handler = new ReportHandler(
+			reporters: $reporters,
+			issues: $issues,
 		);
 
 		$handler->release();
@@ -118,18 +131,23 @@ final class ReportHandlerTest extends TestCase {
 		$reporters = new InMemoryReporters();
 		$reporters->add( reporter: new StdoutReporter( $backtrace ) );
 
+		$issues                         = new InMemoryIssues();
+		$issues->add(
+			issue: Issue::from_exception(
+				exception: $exception_a = new Exception( 'Error AAA' ),
+				occured_at: $date_a     = new DateTimeImmutable( '2 days ago' ),
+			),
+		);
+		$issues->add(
+			issue: Issue::from_exception(
+				exception: $exception_b = new Exception( 'Error BBB' ),
+				occured_at: $date_b     = new DateTimeImmutable( 'now' ),
+			),
+		);
+
 		$handler = new ReportHandler(
 			reporters: $reporters,
-		);
-
-		$handler->report(
-			exception: $exception_a = new Exception( 'Error AAA' ),
-			occured_at: $date_a     = new DateTimeImmutable( '2 days ago' ),
-		);
-
-		$handler->report(
-			exception: $exception_b = new Exception( 'Error BBB' ),
-			occured_at: $date_b     = new DateTimeImmutable( 'now' ),
+			issues: $issues,
 		);
 
 		ob_start();
@@ -165,18 +183,23 @@ final class ReportHandlerTest extends TestCase {
 		$reporters->add( reporter: new StdoutReporter( $backtrace ) );
 		$reporters->add( reporter: new LogReporter( $logger ) );
 
+		$issues = new InMemoryIssues();
+		$issues->add(
+			issue: Issue::from_exception(
+				exception: new Exception( 'Error AAA' ),
+				occured_at: new DateTimeImmutable( '2 days ago' ),
+			),
+		);
+		$issues->add(
+			issue: Issue::from_exception(
+				exception: new Exception( 'Error BBB' ),
+				occured_at: new DateTimeImmutable( 'now' ),
+			),
+		);
+
 		$handler = new ReportHandler(
 			reporters: $reporters,
-		);
-
-		$handler->report(
-			exception: new Exception( 'Error AAA' ),
-			occured_at: new DateTimeImmutable( '2 days ago' ),
-		);
-
-		$handler->report(
-			exception: new Exception( 'Error BBB' ),
-			occured_at: new DateTimeImmutable( 'now' ),
+			issues: $issues,
 		);
 
 		ob_start();
@@ -205,11 +228,17 @@ final class ReportHandlerTest extends TestCase {
 			)
 		);
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
+		$issues = new InMemoryIssues();
+		$issues->add(
+			issue: Issue::from_exception(
+				exception: new Exception( 'Oops!' ),
+			),
 		);
 
-		$handler->report( exception: new Exception( 'Oops!' ) );
+		$handler = new ReportHandler(
+			reporters: $reporters,
+			issues: $issues,
+		);
 
 		$this->assertFalse( $reported );
 		$this->assertEmpty( $reported_message );
