@@ -44,7 +44,7 @@ final class ReportHandlerTest extends TestCase {
 		);
 
 		ob_start();
-		$handler->release();
+		$handler->publish();
 		$stdout = ob_get_clean();
 
 		$expected = sprintf(
@@ -81,7 +81,7 @@ final class ReportHandlerTest extends TestCase {
 		);
 
 		ob_start();
-		$handler->release();
+		$handler->publish();
 		$stdout = ob_get_clean();
 
 		$expected = sprintf(
@@ -115,7 +115,7 @@ final class ReportHandlerTest extends TestCase {
 			issues: $issues,
 		);
 
-		$handler->release();
+		$handler->publish();
 
 		$this->assertTrue( file_exists( $path ) );
 		$this->assertNotEmpty( file_get_contents( $path ) );
@@ -151,7 +151,7 @@ final class ReportHandlerTest extends TestCase {
 		);
 
 		ob_start();
-		$handler->release();
+		$handler->publish();
 		$stdout = ob_get_clean();
 
 		$expected_a = sprintf(
@@ -203,7 +203,7 @@ final class ReportHandlerTest extends TestCase {
 		);
 
 		ob_start();
-		$handler->release();
+		$handler->publish();
 		$stdout = ob_get_clean();
 
 		preg_match_all( '/Error AAA/', $stdout, $matches_a );
@@ -243,7 +243,7 @@ final class ReportHandlerTest extends TestCase {
 		$this->assertFalse( $reported );
 		$this->assertEmpty( $reported_message );
 
-		$handler->release();
+		$handler->publish();
 
 		$this->assertTrue( $reported );
 		$this->assertSame( 'Oops!', $reported_message );
