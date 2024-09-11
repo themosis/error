@@ -6,19 +6,19 @@
 
 declare(strict_types=1);
 
-namespace Themosis\Components\Error\Reporters;
+namespace Themosis\Components\Error\Reporters\Conditions;
 
 use Closure;
 use Themosis\Components\Error\Issue;
-use Themosis\Components\Error\Reporter;
+use Themosis\Components\Error\ReportCondition;
 
-final class CallbackReporter implements Reporter {
+final class CallbackCondition implements ReportCondition {
 	public function __construct(
 		private Closure $callback,
 	) {
 	}
 
-	public function report( Issue $issue ): void {
-		( $this->callback )( $issue );
+	public function can( Issue $issue ): bool {
+		return ( $this->callback )( $issue );
 	}
 }

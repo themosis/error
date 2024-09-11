@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2024 Julien Lambé <julien@themosis.com>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 declare(strict_types=1);
 
 namespace Themosis\Components\Error\Tests;
@@ -14,8 +18,10 @@ use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\InMemoryIssues;
 use Themosis\Components\Error\InMemoryReporters;
 use Themosis\Components\Error\Issue;
-use Themosis\Components\Error\ReportCondition;
 use Themosis\Components\Error\Reporters\CallbackReporter;
+use Themosis\Components\Error\Reporters\Conditions\AlwaysReport;
+use Themosis\Components\Error\Reporters\Conditions\CallbackCondition;
+use Themosis\Components\Error\Reporters\Conditions\Dont;
 use Themosis\Components\Error\Reporters\LogReporter;
 use Themosis\Components\Error\Reporters\StdoutReporter;
 use Themosis\Components\Error\ReportHandler;
@@ -28,13 +34,7 @@ final class ReportHandlerTest extends TestCase {
 
 		$reporters = new InMemoryReporters();
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new StdoutReporter( $backtrace )
 		);
 
@@ -72,33 +72,15 @@ final class ReportHandlerTest extends TestCase {
 
 		$reporters = new InMemoryReporters();
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new StdoutReporter( $backtrace )
 		);
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new StdoutReporter( $backtrace )
 		);
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new StdoutReporter( $backtrace )
 		);
 
@@ -136,13 +118,7 @@ final class ReportHandlerTest extends TestCase {
 
 		$reporters = new InMemoryReporters();
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new LogReporter( $logger )
 		);
 
@@ -174,13 +150,7 @@ final class ReportHandlerTest extends TestCase {
 
 		$reporters = new InMemoryReporters();
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new StdoutReporter( $backtrace )
 		);
 
@@ -234,23 +204,11 @@ final class ReportHandlerTest extends TestCase {
 
 		$reporters = new InMemoryReporters();
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new StdoutReporter( $backtrace )
 		);
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new LogReporter( $logger )
 		);
 
@@ -291,13 +249,7 @@ final class ReportHandlerTest extends TestCase {
 
 		$reporters = new InMemoryReporters();
 		$reporters->add(
-			condition: new class() implements ReportCondition {
-                // phpcs:disable
-				public function can( Issue $issue ): bool {
-					return true;
-				}
-                // phpcs:enable
-			},
+			condition: new AlwaysReport(),
 			reporter: new CallbackReporter(
 				static function ( Issue $issue ) use ( &$reported, &$reported_message ) {
 					$reported         = true;
@@ -325,5 +277,45 @@ final class ReportHandlerTest extends TestCase {
 
 		$this->assertTrue( $reported );
 		$this->assertSame( 'Oops!', $reported_message );
+	}
+
+	#[Test]
+	public function it_can_report_only_with_allowed_reporters(): void {
+		$reporters = new InMemoryReporters();
+		$reporters->add(
+			condition: new Dont( new AlwaysReport() ),
+			reporter: new CallbackReporter(
+				function ( Issue $issue ) {
+					echo 'Should Not Be Reported!';
+					echo $issue->message();
+				}
+			),
+		);
+		$reporters->add(
+			condition: new CallbackCondition(
+				function ( Issue $issue ) {
+					return $issue->exception() instanceof Exception;
+				}
+			),
+			reporter: new CallbackReporter(
+				function ( Issue $issue ) {
+					echo "This is a reported issue.\n";
+					echo $issue->message();
+				}
+			),
+		);
+
+		$handler = new ReportHandler(
+			reporters: $reporters,
+			issues: new InMemoryIssues(),
+		);
+
+		$handler->capture( Issue::from_exception( new Exception( 'Oops!' ) ) );
+
+		ob_start();
+		$handler->publish();
+		$stdout = ob_get_clean();
+
+		$this->assertSame( "This is a reported issue.\nOops!", $stdout );
 	}
 }
