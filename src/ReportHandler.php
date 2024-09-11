@@ -22,22 +22,22 @@ final class ReportHandler {
 	}
 
 	public function publish(): void {
-		$call_reporters_on_captured_issues = static function ( Issues $issues ) {
-			return static function ( Reporters $reporters ) use ( $issues ) {
-				array_map(
-					static function ( Issue $issue ) use ( $reporters ) {
-						array_map(
-							static function ( Reporter $reporter ) use ( $issue ) {
-								$reporter->report( $issue );
-							},
-							$reporters->get_allowed_reporters( $issue ),
-						);
-					},
-					$issues->all(),
-				);
-			};
+		$should_stop = function ( ?int $code ): bool {
+			return ! is_null( $code ) && 0 < (int) $code;
 		};
 
-		$call_reporters_on_captured_issues( $this->issues )( $this->reporters );
+		array_reduce(
+			$this->issues->all(),
+			static function ( callable $reporters_for, Issue $issue ) use ( $should_stop ) {
+				foreach ( $reporters_for( $issue ) as $reporter ) {
+					if ( $should_stop( $reporter->report( $issue ) ) ) {
+						break;
+					}
+				}
+
+				return $reporters_for;
+			},
+			$this->reporters->get_allowed_reporters( ... )
+		);
 	}
 }
