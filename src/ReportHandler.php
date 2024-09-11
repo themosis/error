@@ -26,7 +26,7 @@ final class ReportHandler {
 							static function ( Reporter $reporter ) use ( $issue ) {
 								$reporter->report( $issue );
 							},
-							$reporters->all(),
+							$reporters->get_allowed_reporters( $issue ),
 						);
 					},
 					$issues->all(),

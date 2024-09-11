@@ -10,6 +10,7 @@ use Themosis\Components\Error\ErrorHandler;
 use Themosis\Components\Error\InMemoryIssues;
 use Themosis\Components\Error\InMemoryReporters;
 use Themosis\Components\Error\Issue;
+use Themosis\Components\Error\ReportCondition;
 use Themosis\Components\Error\Reporters\CallbackReporter;
 use Themosis\Components\Error\ReportHandler;
 
@@ -81,6 +82,13 @@ final class ErrorHandlerTest extends TestCase {
 
 		$reporters = new InMemoryReporters();
 		$reporters->add(
+			condition: new class() implements ReportCondition {
+                // phpcs:disable
+				public function can( Issue $issue ): bool {
+					return true;
+				}
+                // phpcs:enable
+			},
 			reporter: new CallbackReporter(
 				function ( Issue $issue ) {
 					echo $issue->message();
@@ -88,6 +96,13 @@ final class ErrorHandlerTest extends TestCase {
 			),
 		);
 		$reporters->add(
+			condition: new class() implements ReportCondition {
+                // phpcs:disable
+				public function can( Issue $issue ): bool {
+					return true;
+				}
+                // phpcs:enable
+			},
 			reporter: new CallbackReporter(
 				function ( Issue $issue ) use ( &$fake_log_message ) {
 					$fake_log_message = $issue->message();
