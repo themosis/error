@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Themosis\Components\Error;
 
+use Closure;
+
 final class ReportHandler {
 	public function __construct(
 		private Reporters $reporters,
@@ -22,15 +24,20 @@ final class ReportHandler {
 	}
 
 	public function publish(): void {
-		$should_stop = function ( ?int $code ): bool {
-			return ! is_null( $code ) && 0 < (int) $code;
+		$should_stop = static function ( Reporter $reporter ): Closure {
+			return static function ( Issue $issue ) use ( $reporter ): bool {
+				return $reporter instanceof HaltReporter && $reporter->stop( $issue );
+			};
 		};
 
 		array_reduce(
 			$this->issues->all(),
 			static function ( callable $reporters_for, Issue $issue ) use ( $should_stop ) {
 				foreach ( $reporters_for( $issue ) as $reporter ) {
-					if ( $should_stop( $reporter->report( $issue ) ) ) {
+					/** @var Reporter $reporter */
+					$reporter->report( $issue );
+
+					if ( $should_stop( $reporter )( $issue ) ) {
 						break;
 					}
 				}

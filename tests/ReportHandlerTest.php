@@ -18,6 +18,7 @@ use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\InMemoryIssues;
 use Themosis\Components\Error\InMemoryReporters;
 use Themosis\Components\Error\Issue;
+use Themosis\Components\Error\Reporters\AlwaysStopAfter;
 use Themosis\Components\Error\Reporters\CallbackReporter;
 use Themosis\Components\Error\Reporters\Conditions\AlwaysReport;
 use Themosis\Components\Error\Reporters\Conditions\CallbackCondition;
@@ -317,5 +318,43 @@ final class ReportHandlerTest extends TestCase {
 		$stdout = ob_get_clean();
 
 		$this->assertSame( "This is a reported issue.\nOops!", $stdout );
+	}
+
+	#[Test]
+	public function it_can_not_propagate_report_if_reporter_can_be_stopped(): void {
+		$reporters = new InMemoryReporters();
+		$reporters->add(
+			condition: new AlwaysReport(),
+			reporter: new AlwaysStopAfter(
+				new CallbackReporter(
+					function ( Issue $issue ) {
+						echo "Only this is reported.\n";
+						echo $issue->message();
+					}
+				)
+			),
+		);
+		$reporters->add(
+			condition: new AlwaysReport(),
+			reporter: new CallbackReporter(
+				function ( Issue $issue ) {
+					echo "This should not be reported.\n";
+					echo $issue->message();
+				}
+			),
+		);
+
+		$handler = new ReportHandler(
+			reporters: $reporters,
+			issues: new InMemoryIssues(),
+		);
+
+		$handler->capture( Issue::from_exception( new Exception( 'Oops!' ) ) );
+
+		ob_start();
+		$handler->publish();
+		$stdout = ob_get_clean();
+
+		$this->assertSame( "Only this is reported.\nOops!", $stdout );
 	}
 }
