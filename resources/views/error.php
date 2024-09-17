@@ -33,6 +33,7 @@ $reporters->add(
         $backtrace->capture_exception($issue->exception());
 
         $html = $content([
+            'title' => $issue->message(),
             'message' => $issue->message(),
             'exception_class' => get_class($issue->exception()),
             'file' => sprintf('%s:%s', $issue->exception()->getFile(), $issue->exception()->getLine()),

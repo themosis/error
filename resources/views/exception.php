@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Exception</title>
+    <title><?= $title ?></title>
     <style type="text/css">
         :root {
             --color-white: #ffffff;
 
             --color-gray-100: rgb(252, 253, 253);
+            --color-gray-300: rgb(240, 243, 245);
+            --color-gray-600: rgb(121, 123, 127);
 
-            --color-primary-100: rgb(251, 253, 255);
-            --color-primary-200: rgb(241, 243, 245);
-            --color-primary-500: rgb(0, 123, 255);
-            --color-primary-700: rgb(0, 79, 168);
-            --color-primary-800: rgb(24, 78, 116);
-            --color-primary-900: rgb(38, 49, 68);
+            --color-blue-100: rgb(251, 253, 255);
+            --color-blue-200: rgb(241, 243, 245);
+            --color-blue-300: rgb(230, 245, 255);
+            --color-blue-500: rgb(0, 123, 255);
+            --color-blue-700: rgb(0, 79, 168);
+            --color-blue-800: rgb(24, 78, 116);
+            --color-blue-900: rgb(38, 49, 68);
 
-            --color-secondary-100: rgb(252, 250, 248);
-            --color-secondary-200: rgb(249, 244, 245);
+            --color-red-100: rgb(255, 240, 235);
+            --color-red-200: rgb(250, 224, 212);
+
+            --color-yellow-500: rgb(255, 226, 115);
 
             --space-none: 0;
             --space-xs: 0.25rem;
@@ -64,7 +68,7 @@
         #sidebar {
             position: fixed;
             z-index: 100;
-            background-color: var(--color-primary-900);
+            background-color: var(--color-blue-900);
             height: calc(100% - (var(--space-sm) * 2));
             width: var(--sidebar-width);
             flex: 0 0 auto;
@@ -87,17 +91,19 @@
         .nav li a:link,
         .nav li a:visited {
             display: block;
-            background: var(--color-primary-900);
+            background: var(--color-blue-900);
             color: var(--color-white);
             text-align: center;
             text-decoration: none;
             padding-top: var(--space-sm);
             padding-bottom: var(--space-sm);
             border-radius: var(--radius-sm);
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .nav li a:hover {
-            background: var(--color-primary-700);
+            background: var(--color-blue-700);
             color: var(--color-white);
         }
 
@@ -111,8 +117,17 @@
             width: 100%;
         }
 
+        #issue {
+            background: var(--color-red-100);
+            padding: 0;
+        }
+
+        #exception {
+            padding: var(--space-md);
+        }
+
         .section {
-            background-color: var(--color-secondary-200);
+            background: var(--color-gray-300);
             border-radius: var(--radius);
             padding: var(--space-md);
             margin-bottom: var(--space-md);
@@ -120,7 +135,7 @@
 
         .section-title {
             display: inline-block;
-            background: var(--color-primary-700);
+            background: var(--color-blue-700);
             color: var(--color-white);
             padding: var(--space-sm);
             font-size: 1rem;
@@ -135,14 +150,57 @@
             line-height: 1.1;
             margin-top: var(--space-md);
             margin-bottom: var(--space-sm);
-            color: var(--color-primary-900);
+            color: var(--color-blue-900);
         }
 
         .file {
             font-size: 1.25rem;
             margin-top: var(--space-sm);
-            margin-bottom: var(--space-lg);
-            color: var(--color-primary-800);
+            margin-bottom: var(--space-md);
+            color: var(--color-blue-800);
+        }
+
+        .preview {
+            color: var(--color-blue-900);
+            overflow: hidden;
+            background: var(--color-white);
+            border-radius: var(--radius);
+            padding: 0 var(--space-sm);
+        }
+
+        .preview pre {
+            margin: 0;
+            white-space: collapse;
+        }
+
+        .preview code {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1;
+        }
+
+        .line-number {
+            padding-right: var(--space-sm);
+            margin-right: var(--space-sm);
+            color: var(--color-gray-600);
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border-right: 1px solid var(--color-blue-700);
+        }
+
+        .current-line {
+            background: var(--color-yellow-500);
+            display: inline;
+            border-radius: var(--radius-sm);
+            padding: 0 var(--space-xs);
+        }
+
+        #backtrace {
+            padding: var(--space-md);
+            border-top: 1px solid var(--color-red-200);
         }
 
         .frame {
@@ -153,7 +211,7 @@
         }
 
         .frame:hover {
-            background: var(--color-primary-100);
+            background: var(--color-blue-300);
         }
 
         .frame:last-of-type {
@@ -162,7 +220,7 @@
 
         .frame span {
             display: inline-block;
-            background: var(--color-primary-900);
+            background: var(--color-blue-900);
             color: var(--color-white);
             border-radius: var(--radius-sm);
             padding: var(--space-xs) var(--space-sm);
@@ -171,7 +229,7 @@
 
         .frame p {
             font-size: 1.125rem;
-            color: var(--color-primary-800);
+            color: var(--color-blue-800);
             margin-top: var(--space-sm);
             margin-bottom: 0;
         }
@@ -182,14 +240,14 @@
 
         .info {
             background: var(--color-white);
-            color: var(--color-primary-900);
+            color: var(--color-blue-900);
             padding-top: var(--space-sm);
             padding-bottom: var(--space-sm);
             border-radius: var(--radius);
         }
 
         .info-key {
-            background: var(--color-primary-900);
+            background: var(--color-blue-900);
             color: var(--color-white);
             padding: var(--space-sm);
             border-radius: var(--radius);
@@ -202,16 +260,21 @@
         }
 
         @media screen and (min-width: 640px) {
+            :root {
+                --sidebar-width: 80px;
+            }
+
             .section {
+                padding: var(--space-lg);
+            }
+
+            #exception,
+            #backtrace {
                 padding: var(--space-lg);
             }
         }
 
         @media screen and (min-width: 1024px) {
-            :root {
-                --sidebar-width: 80px;
-            }
-
             body {
                 margin: var(--space-md);
             }
@@ -229,10 +292,13 @@
                 margin-left: auto;
                 margin-right: auto;
             }
+
+            .section-title {
+                padding: var(--space-sm) var(--space-md);
+            }
         }
     </style>
 </head>
-
 <body>
     <div id="page">
         <!-- Sidebar -->
@@ -253,12 +319,24 @@
         <main id="main">
             <div class="wrapper">
                 <section id="issue" class="section">
-                    <h2 class="section-title"><?= $exception_class ?></h2>
-                    <p class="message"><?= $message ?></p>
-                    <p class="file"><?= $file ?></p>
+                    <div id="exception">
+                        <h2 class="section-title"><?= $exception_class ?></h2>
+                        <p class="message"><?= $message ?></p>
+                        <p class="file"><?= $file ?></p>
+                        <div class="preview">
+                            <pre>
+                                <code>
+<span class="line-number">1</span><span><?php echo htmlentities('<?php'); ?></span>
+<span class="line-number">2</span>
+<span class="line-number">3</span><span class="current-line">throw new Exception('There was an error when calling the checkout client.', previous: new RuntimeException('Oops!'));</span>
+<span class="line-number">4</span>
+                                </code>
+                            </pre>
+                        </div>
+                    </div>
                     <?php $frames(
                         fn(string $frames) => <<<BACKTRACE
-                            <div class="backtrace">{$frames}</div>
+                            <div id="backtrace">{$frames}</div>
                         BACKTRACE)(
                         fn(string $function, string $file) => <<<FRAME
                             <div class="frame">
@@ -281,5 +359,4 @@
         <!-- End Main -->
     </div>
 </body>
-
 </html>
