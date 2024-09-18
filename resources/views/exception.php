@@ -9,7 +9,9 @@
             --color-white: #ffffff;
 
             --color-gray-100: rgb(252, 253, 253);
+            --color-gray-200: rgb(246, 249, 251);
             --color-gray-300: rgb(240, 243, 245);
+            --color-gray-500: rgb(141, 153, 155);
             --color-gray-600: rgb(121, 123, 127);
 
             --color-blue-100: rgb(251, 253, 255);
@@ -22,6 +24,7 @@
 
             --color-red-100: rgb(255, 240, 235);
             --color-red-200: rgb(250, 224, 212);
+            --color-red-800: rgb(125, 30, 10);
 
             --color-yellow-500: rgb(255, 226, 115);
 
@@ -156,7 +159,7 @@
         .file {
             font-size: 1.25rem;
             margin-top: var(--space-sm);
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--space-lg);
             color: var(--color-blue-800);
         }
 
@@ -165,7 +168,7 @@
             overflow: hidden;
             background: var(--color-white);
             border-radius: var(--radius);
-            padding: 0 var(--space-sm);
+            padding: 0;
         }
 
         .preview pre {
@@ -174,16 +177,34 @@
         }
 
         .preview code {
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            word-break: break-word;
-            line-height: 1;
+            word-wrap: anywhere;
+        }
+
+        .line {
+            display: inline-block;
+            width: 100%;
+            background: var(--color-white);
+            line-height: 1.625;
+        }
+
+        .line:nth-of-type(even) {
+            background: var(--color-gray-300);
+        }
+
+        .line:hover {
+            background: var(--color-blue-300);
+        }
+
+        .current-line,
+        .line.current-line {
+            background: var(--color-yellow-500);
         }
 
         .line-number {
+            display: inline-block;
+            padding-left: var(--space-sm);
             padding-right: var(--space-sm);
-            margin-right: var(--space-sm);
-            color: var(--color-gray-600);
+            color: var(--color-gray-500);
             -moz-user-select: none;
             -webkit-user-select: none;
             -ms-user-select: none;
@@ -191,11 +212,19 @@
             border-right: 1px solid var(--color-blue-700);
         }
 
-        .current-line {
-            background: var(--color-yellow-500);
-            display: inline;
-            border-radius: var(--radius-sm);
-            padding: 0 var(--space-xs);
+        .current-line .line-number {
+            color: var(--color-red-800);
+        }
+
+        .line:nth-of-type(even) .line-number {
+            color: var(--color-gray-600);
+        }
+
+        .line-content {
+            position: relative;
+            padding-left: var(--space-sm);
+            padding-right: var(--space-sm);
+            z-index: 1;
         }
 
         #backtrace {
@@ -323,16 +352,29 @@
                         <h2 class="section-title"><?= $exception_class ?></h2>
                         <p class="message"><?= $message ?></p>
                         <p class="file"><?= $file ?></p>
+                        <?php if (isset($preview)): ?>
                         <div class="preview">
                             <pre>
                                 <code>
-<span class="line-number">1</span><span><?php echo htmlentities('<?php'); ?></span>
-<span class="line-number">2</span>
-<span class="line-number">3</span><span class="current-line">throw new Exception('There was an error when calling the checkout client.', previous: new RuntimeException('Oops!'));</span>
-<span class="line-number">4</span>
+<?php foreach ($preview->get_lines() as $number => $line): ?>
+<span class="line<?php echo($preview->is_current_line($number + 1) ? ' current-line' : ''); ?>"><span class="line-number"><?= $number + 1 ?></span><span class="line-content"><?= $line ?></span></span>
+<?php endforeach; ?>
                                 </code>
                             </pre>
                         </div>
+                        <?php endif; ?>
+                        <!--
+                        <div class="preview">
+                            <pre>
+                                <code>
+<span class="line"><span class="line-number">1</span><span class="line-content"><?php //echo htmlentities('<?php'); ?></span></span>
+<span class="line"><span class="line-number">2</span><span class="line-content"></span></span>
+<span class="line current-line"><span class="line-number">3</span><span class="line-content">throw new Exception('There was an error when calling the checkout client.', previous: new RuntimeException('Oops!'));</span></span>
+<span class="line"><span class="line-number">4</span><span class="line-content"></span></span>
+                                </code>
+                            </pre>
+                        </div>
+                        -->
                     </div>
                     <?php $frames(
                         fn(string $frames) => <<<BACKTRACE

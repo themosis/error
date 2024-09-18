@@ -1,6 +1,8 @@
 <?php
 
 use Themosis\Components\Error\Backtrace\Backtrace;
+use Themosis\Components\Error\Backtrace\File;
+use Themosis\Components\Error\Backtrace\FilePreview;
 use Themosis\Components\Error\Backtrace\Frame;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\ExceptionHandler;
@@ -37,6 +39,7 @@ $reporters->add(
             'message' => $issue->message(),
             'exception_class' => get_class($issue->exception()),
             'file' => sprintf('%s:%s', $issue->exception()->getFile(), $issue->exception()->getLine()),
+            'preview' => $issue->preview(),
             'frames' => static function ($wrapper_callback) use ($backtrace) {
                 return static function ($nested_callback) use ($backtrace, $wrapper_callback) {
                     if (empty($backtrace->frames())) {

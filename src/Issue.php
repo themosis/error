@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Themosis\Components\Error;
 
 use DateTimeImmutable;
+use Themosis\Components\Error\Backtrace\File;
+use Themosis\Components\Error\Backtrace\FilePreview;
 use Throwable;
 
 final class Issue {
@@ -58,4 +60,14 @@ final class Issue {
 	public function occured_at(): IssueDate {
 		return $this->occured_at;
 	}
+
+    public function preview(): FilePreview
+    {
+        return new FilePreview(
+            file: new File(
+                filepath: $this->exception->getFile(),
+                line: $this->exception->getLine(),
+            ),
+        );
+    }
 }
