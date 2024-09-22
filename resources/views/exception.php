@@ -210,6 +210,7 @@
             -ms-user-select: none;
             user-select: none;
             border-right: 1px solid var(--color-blue-700);
+            text-align: right;
         }
 
         .current-line .line-number {
@@ -357,24 +358,12 @@
                             <pre>
                                 <code>
 <?php foreach ($preview->get_lines() as $number => $line): ?>
-<span class="line<?php echo($preview->is_current_line($number + 1) ? ' current-line' : ''); ?>"><span class="line-number"><?= $number + 1 ?></span><span class="line-content"><?= $line ?></span></span>
+<span class="line<?php echo($preview->is_current_line($number) ? ' current-line' : ''); ?>"><span class="line-number" style="min-width: calc(10px * <?= $preview->row_number_length() ?>);"><?= $number ?></span><span class="line-content"><?= $line ?></span></span>
 <?php endforeach; ?>
                                 </code>
                             </pre>
                         </div>
                         <?php endif; ?>
-                        <!--
-                        <div class="preview">
-                            <pre>
-                                <code>
-<span class="line"><span class="line-number">1</span><span class="line-content"><?php //echo htmlentities('<?php'); ?></span></span>
-<span class="line"><span class="line-number">2</span><span class="line-content"></span></span>
-<span class="line current-line"><span class="line-number">3</span><span class="line-content">throw new Exception('There was an error when calling the checkout client.', previous: new RuntimeException('Oops!'));</span></span>
-<span class="line"><span class="line-number">4</span><span class="line-content"></span></span>
-                                </code>
-                            </pre>
-                        </div>
-                        -->
                     </div>
                     <?php $frames(
                         fn(string $frames) => <<<BACKTRACE

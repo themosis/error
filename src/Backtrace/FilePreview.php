@@ -4,54 +4,71 @@ declare(strict_types=1);
 
 namespace Themosis\Components\Error\Backtrace;
 
-final class FilePreview
-{
-    public function __construct(
-        private File $file,
-    ) {
-    }
+use SplFileObject;
 
-    public function all_lines(): array
-    {
-        $lines = [];
-        $file_resource = fopen($this->file->path(), 'r');      
+final class FilePreview {
+	private SplFileObject $resource;
 
-        while ( !feof($file_resource) ) {
-            $line = fgets($file_resource);
+	private int $total_rows;
 
-            if ( false !== $line ) {
-                $lines[] = htmlentities($line);
-            }
-        }
+	private array $lines = [];
 
-        fclose($file_resource);
+	public function __construct(
+		private File $file,
+	) {
+		$this->resource   = new SplFileObject( $this->file->path() );
+		$this->total_rows = $this->get_total_rows();
+	}
 
-        return $lines;
-    }
+	private function get_total_rows(): int {
+		$this->resource->seek( PHP_INT_MAX );
 
-    public function get_lines( int $range = 10 ): array
-    {
-        $all_lines = $this->all_lines();
+		return $this->resource->key();
+	}
 
-        $start = ($this->file->line() - $range) < 1
-            ? 1
-            : $this->file->line() - $range;
+	public function get_lines( int $range = 10 ): array {
+		if ( ! empty( $this->lines ) ) {
+			return $this->lines;
+		}
 
-        $total = count($all_lines);
-        $length = ($this->file->line() + $range) > $total
-            ? (($total - $this->file->line()) < $this->file->line() ? $total : $total - $this->file->line())
-            : ((1 === $start) ? $this->file->line() + ($this->file->line() - $start) : $range * 2);
+		$calculate_range = function ( int $initial_range ) {
+			$line_number = $this->file->line();
 
-        return array_slice(
-            array: $all_lines,
-            offset: $start - 1,
-            length: $length,
-            preserve_keys: true,
-        );
-    }
+			if ( ( $line_number - $initial_range ) < 1 ) {
+				return $line_number - 1;
+			}
 
-    public function is_current_line(int $line): bool
-    {
-        return $line === $this->file->line();
-    }
+			if ( ( $line_number + $initial_range ) > $this->total_rows ) {
+				return $this->total_rows - $line_number;
+			}
+
+			return $initial_range;
+		};
+
+		$range     = $calculate_range( $range );
+		$start_row = $this->file->line() - $range;
+		$end_row   = $this->file->line() + $range;
+
+		$current_row = $start_row;
+
+		while ( $current_row <= $end_row ) {
+			$this->resource->seek( $current_row - 1 );
+
+			$this->lines[ $current_row ] = htmlentities( $this->resource->fgets() );
+			++$current_row;
+		}
+
+		return $this->lines;
+	}
+
+	public function row_number_length(): int {
+		$row_numbers        = array_keys( $this->get_lines() );
+		$highest_row_number = max( ...$row_numbers );
+
+		return mb_strlen( (string) $highest_row_number );
+	}
+
+	public function is_current_line( int $line ): bool {
+		return $line === $this->file->line();
+	}
 }

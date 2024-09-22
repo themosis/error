@@ -26,10 +26,9 @@ final class File implements Stringable {
 		return $this->filepath ?? '';
 	}
 
-    public function line(): int
-    {
-        return $this->line;
-    }
+	public function line(): int {
+		return $this->line;
+	}
 
 	public function __toString(): string {
 		if ( null === $this->filepath ) {

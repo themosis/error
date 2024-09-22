@@ -61,13 +61,12 @@ final class Issue {
 		return $this->occured_at;
 	}
 
-    public function preview(): FilePreview
-    {
-        return new FilePreview(
-            file: new File(
-                filepath: $this->exception->getFile(),
-                line: $this->exception->getLine(),
-            ),
-        );
-    }
+	public function preview(): FilePreview {
+		return new FilePreview(
+			file: new File(
+				filepath: $this->exception->getFile(),
+				line: $this->exception->getLine(),
+			),
+		);
+	}
 }
