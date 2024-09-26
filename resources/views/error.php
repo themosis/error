@@ -1,9 +1,10 @@
 <?php
 
+use Themosis\Components\Error\Backtrace\AppFrameTag;
 use Themosis\Components\Error\Backtrace\Backtrace;
-use Themosis\Components\Error\Backtrace\File;
-use Themosis\Components\Error\Backtrace\FilePreview;
+use Themosis\Components\Error\Backtrace\CustomFrameIdentifier;
 use Themosis\Components\Error\Backtrace\Frame;
+use Themosis\Components\Error\Backtrace\FrameTag;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\ExceptionHandler;
 use Themosis\Components\Error\InMemoryIssues;
@@ -28,8 +29,20 @@ $reporters->add(
             return require __DIR__ . '/exception.php';
         };
 
+        $identifiers = new InMemoryFrameIdentifiers();
+        $identifiers->add(new CustomFrameIdentifier(
+            tag: new AppFrameTag(),
+            identifier: static function (Frame $frame) {
+                if (str_contains($frame->get_file()->path(), 'nested-error')) {
+                    return true;
+                }
+
+                return false;
+            },
+        ));
+
         $backtrace = new Backtrace(
-            frame_identifiers: new InMemoryFrameIdentifiers(),
+            frame_identifiers: $identifiers,
         );
 
         $backtrace->capture_exception($issue->exception());
@@ -42,16 +55,23 @@ $reporters->add(
             'preview' => $issue->preview(),
             'frames' => static function ($wrapper_callback) use ($backtrace) {
                 return static function ($nested_callback) use ($backtrace, $wrapper_callback) {
-                    if (empty($backtrace->frames())) {
-                        return;
-                    }
+                    return static function ($tag_callback) use ($backtrace, $nested_callback, $wrapper_callback) {
+                        if (empty($backtrace->frames())) {
+                            return;
+                        }
 
-                    echo $wrapper_callback(implode('', array_map(static function (Frame $frame) use ($nested_callback) {
-                        $function = htmlentities($frame->get_function());
-                        $file = htmlentities($frame->get_file());
+                        echo $wrapper_callback(implode('', array_map(static function (Frame $frame) use ($nested_callback, $tag_callback) {
+                            $function = htmlentities($frame->get_function());
+                            $file = htmlentities($frame->get_file());
 
-                        return $nested_callback($function, $file);
-                    }, $backtrace->frames())));
+
+                            $tags = array_map(static function (FrameTag $tag) use ($tag_callback) {
+                                return $tag_callback($tag->name());
+                            }, $frame->tags());
+
+                            return $nested_callback($function, $file, implode(PHP_EOL, $tags));
+                        }, $backtrace->frames())));
+                    };
                 };
             },
         ]);

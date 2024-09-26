@@ -209,7 +209,7 @@
             -webkit-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            border-right: 1px solid var(--color-blue-700);
+            border-right: 1px solid var(--color-blue-500);
             text-align: right;
         }
 
@@ -228,6 +228,10 @@
             z-index: 1;
         }
 
+        .current-line .line-content {
+            color: var(--color-red-800);
+        }
+
         #backtrace {
             padding: var(--space-md);
             border-top: 1px solid var(--color-red-200);
@@ -241,20 +245,11 @@
         }
 
         .frame:hover {
-            background: var(--color-blue-300);
+            background: var(--color-blue-100);
         }
 
         .frame:last-of-type {
             margin-bottom: 0;
-        }
-
-        .frame span {
-            display: inline-block;
-            background: var(--color-blue-900);
-            color: var(--color-white);
-            border-radius: var(--radius-sm);
-            padding: var(--space-xs) var(--space-sm);
-            word-break: break-all;
         }
 
         .frame p {
@@ -262,6 +257,28 @@
             color: var(--color-blue-800);
             margin-top: var(--space-sm);
             margin-bottom: 0;
+        }
+
+        .frame-identifiers {
+            display: flex;
+            justify-content: flex-start;
+            align-items: stretch;
+            width: 100%;
+            gap: var(--space-sm);
+        }
+
+        .frame-identifier {
+            display: inline-block;
+            background: var(--color-blue-300);
+            color: var(--color-blue-900);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+            word-break: break-all;
+        }
+
+        .frame-function {
+            background: var(--color-blue-900);
+            color: var(--color-white);
         }
 
         .infos {
@@ -369,12 +386,18 @@
                         fn(string $frames) => <<<BACKTRACE
                             <div id="backtrace">{$frames}</div>
                         BACKTRACE)(
-                        fn(string $function, string $file) => <<<FRAME
+                        fn(string $function, string $file, string $tags) => <<<FRAME
                             <div class="frame">
-                                <span>{$function}</span>
+                                <div class="frame-identifiers">
+                                    <span class="frame-identifier frame-function">{$function}</span>
+                                    {$tags}
+                                </div> 
                                 <p>{$file}</p>
                             </div>
-                        FRAME); ?>
+                        FRAME)(
+                        fn(string $tagname) => <<<TAG
+                            <span class="frame-identifier">{$tagname}</span>
+                        TAG); ?>
                 </section>
                 <section id="infos" class="section">
                     <h2 class="section-title">Additional Information</h2>
