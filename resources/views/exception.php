@@ -370,7 +370,11 @@
                         <h2 class="section-title"><?= $exception_class ?></h2>
                         <p class="message"><?= $message ?></p>
                         <p class="file"><?= $file ?></p>
-                        <?php if (isset($preview)): ?>
+                        <?php
+
+                                        use Themosis\Components\Error\Backtrace\FilePreview;
+
+ if (isset($preview)): ?>
                         <div class="preview">
                             <pre>
                                 <code>
@@ -386,18 +390,31 @@
                         fn(string $frames) => <<<BACKTRACE
                             <div id="backtrace">{$frames}</div>
                         BACKTRACE)(
-                        fn(string $function, string $file, string $tags) => <<<FRAME
-                            <div class="frame">
-                                <div class="frame-identifiers">
-                                    <span class="frame-identifier frame-function">{$function}</span>
-                                    {$tags}
-                                </div> 
-                                <p>{$file}</p>
-                            </div>
+                        fn(string $function, string $file, string $tags, string $lines) => <<<FRAME
+                            <details class="frame">
+                                <summary>
+                                    <div class="frame-identifiers">
+                                        <span class="frame-identifier frame-function">{$function}</span>
+                                        {$tags}
+                                    </div> 
+                                    <p>{$file}</p>
+                                </summary>
+                                <div class="preview">
+                                    <pre>
+                                        <code>
+                                            {$lines}
+                                        </code>
+                                    </pre>
+                                </div>
+                            </details>
                         FRAME)(
                         fn(string $tagname) => <<<TAG
                             <span class="frame-identifier">{$tagname}</span>
-                        TAG); ?>
+                        TAG)(
+                        fn(string $class_name, int $length, int $number, string $line) => <<<LINE
+                        <span class="line {$class_name}"><span class="line-number" style="min-width: calc(10px * {$length});">{$number}</span><span class="line-content">{$line}</span></span>
+                        LINE
+                        ); ?>
                 </section>
                 <section id="infos" class="section">
                     <h2 class="section-title">Additional Information</h2>

@@ -3,6 +3,7 @@
 use Themosis\Components\Error\Backtrace\AppFrameTag;
 use Themosis\Components\Error\Backtrace\Backtrace;
 use Themosis\Components\Error\Backtrace\CustomFrameIdentifier;
+use Themosis\Components\Error\Backtrace\FilePreview;
 use Themosis\Components\Error\Backtrace\Frame;
 use Themosis\Components\Error\Backtrace\FrameTag;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
@@ -56,21 +57,36 @@ $reporters->add(
             'frames' => static function ($wrapper_callback) use ($backtrace) {
                 return static function ($nested_callback) use ($backtrace, $wrapper_callback) {
                     return static function ($tag_callback) use ($backtrace, $nested_callback, $wrapper_callback) {
-                        if (empty($backtrace->frames())) {
-                            return;
-                        }
+                        return static function ($line_callback) use ($backtrace, $nested_callback, $wrapper_callback, $tag_callback) {
+                            if (empty($backtrace->frames())) {
+                                return;
+                            }
 
-                        echo $wrapper_callback(implode('', array_map(static function (Frame $frame) use ($nested_callback, $tag_callback) {
-                            $function = htmlentities($frame->get_function());
-                            $file = htmlentities($frame->get_file());
+                            echo $wrapper_callback(implode('', array_map(static function (Frame $frame) use ($nested_callback, $tag_callback, $line_callback) {
+                                $function = htmlentities($frame->get_function());
+                                $file = htmlentities($frame->get_file());
+
+                                $tags = array_map(static function (FrameTag $tag) use ($tag_callback) {
+                                    return $tag_callback($tag->name());
+                                }, $frame->tags());
+
+                                $file_preview = new FilePreview(
+                                    file: $frame->get_file(),
+                                );
 
 
-                            $tags = array_map(static function (FrameTag $tag) use ($tag_callback) {
-                                return $tag_callback($tag->name());
-                            }, $frame->tags());
+                                $lines = array_map(static function ($line, $number) use ($file_preview, $line_callback) {
+                                    return $line_callback(
+                                        $file_preview->is_current_line($number) ? 'current-line' : '',
+                                        $file_preview->row_number_length(),
+                                        $number,
+                                        $line,
+                                    );
+                                }, $file_preview->get_lines(), array_keys($file_preview->get_lines()));
 
-                            return $nested_callback($function, $file, implode(PHP_EOL, $tags));
-                        }, $backtrace->frames())));
+                                return $nested_callback($function, $file, implode(PHP_EOL, $tags), implode(PHP_EOL, $lines));
+                            }, $backtrace->frames())));
+                        };
                     };
                 };
             },

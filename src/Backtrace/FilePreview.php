@@ -31,21 +31,22 @@ final class FilePreview {
 			return $this->lines;
 		}
 
-		$calculate_range = function ( int $initial_range ) {
+		$adjust_range = function ( int $initial_range ) {
 			$line_number = $this->file->line();
+            $top_range = $bottom_range = $initial_range;
 
 			if ( ( $line_number - $initial_range ) < 1 ) {
-				return $line_number - 1;
+				$top_range = $line_number - 1;
 			}
 
 			if ( ( $line_number + $initial_range ) > $this->total_rows ) {
-				return $this->total_rows - $line_number;
+				$bottom_range = $this->total_rows - $line_number;
 			}
 
-			return $initial_range;
+			return min($top_range, $bottom_range, $initial_range);
 		};
 
-		$range     = $calculate_range( $range );
+		$range     = $adjust_range( $range );
 		$start_row = $this->file->line() - $range;
 		$end_row   = $this->file->line() + $range;
 
