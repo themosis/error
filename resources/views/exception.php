@@ -259,6 +259,20 @@
             margin-bottom: 0;
         }
 
+        .frame summary {
+            list-style: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .frame summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .frame .preview {
+            margin-top: var(--space-md);
+        }
+
         .frame-identifiers {
             display: flex;
             justify-content: flex-start;
@@ -370,27 +384,23 @@
                         <h2 class="section-title"><?= $exception_class ?></h2>
                         <p class="message"><?= $message ?></p>
                         <p class="file"><?= $file ?></p>
-                        <?php
-
-                                        use Themosis\Components\Error\Backtrace\FilePreview;
-
- if (isset($preview)): ?>
-                        <div class="preview">
-                            <pre>
-                                <code>
-<?php foreach ($preview->get_lines() as $number => $line): ?>
-<span class="line<?php echo($preview->is_current_line($number) ? ' current-line' : ''); ?>"><span class="line-number" style="min-width: calc(10px * <?= $preview->row_number_length() ?>);"><?= $number ?></span><span class="line-content"><?= $line ?></span></span>
-<?php endforeach; ?>
-                                </code>
-                            </pre>
-                        </div>
-                        <?php endif; ?>
+                        <?= $preview(
+                        $render_preview = fn (string $lines) => <<<PREVIEW
+                            <div class="preview">
+                                <pre>
+                                    <code>{$lines}</code>
+                                </pre>
+                            </div>
+                        PREVIEW,
+                        $render_preview_line = fn (string $class_name, int $length, int $number, string $line) => <<<LINE
+                            <span class="line {$class_name}"><span class="line-number" style="min-width: calc(10px * {$length});">{$number}</span><span class="line-content">{$line}</span></span>
+                        LINE); ?>
                     </div>
-                    <?php $frames(
+                    <?= $frames(
                         fn(string $frames) => <<<BACKTRACE
                             <div id="backtrace">{$frames}</div>
                         BACKTRACE)(
-                        fn(string $function, string $file, string $tags, string $lines) => <<<FRAME
+                        fn(string $function, string $file, string $tags, string $preview) => <<<FRAME
                             <details class="frame">
                                 <summary>
                                     <div class="frame-identifiers">
@@ -399,22 +409,13 @@
                                     </div> 
                                     <p>{$file}</p>
                                 </summary>
-                                <div class="preview">
-                                    <pre>
-                                        <code>
-                                            {$lines}
-                                        </code>
-                                    </pre>
-                                </div>
+                                {$preview}
                             </details>
                         FRAME)(
                         fn(string $tagname) => <<<TAG
                             <span class="frame-identifier">{$tagname}</span>
                         TAG)(
-                        fn(string $class_name, int $length, int $number, string $line) => <<<LINE
-                        <span class="line {$class_name}"><span class="line-number" style="min-width: calc(10px * {$length});">{$number}</span><span class="line-content">{$line}</span></span>
-                        LINE
-                        ); ?>
+                        fn(Closure $compose) => $compose($render_preview, $render_preview_line)); ?>
                 </section>
                 <section id="infos" class="section">
                     <h2 class="section-title">Additional Information</h2>

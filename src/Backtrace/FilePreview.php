@@ -32,8 +32,9 @@ final class FilePreview {
 		}
 
 		$adjust_range = function ( int $initial_range ) {
-			$line_number = $this->file->line();
-            $top_range = $bottom_range = $initial_range;
+			$line_number  = $this->file->line();
+			$top_range    = $initial_range;
+			$bottom_range = $initial_range;
 
 			if ( ( $line_number - $initial_range ) < 1 ) {
 				$top_range = $line_number - 1;
@@ -43,7 +44,7 @@ final class FilePreview {
 				$bottom_range = $this->total_rows - $line_number;
 			}
 
-			return min($top_range, $bottom_range, $initial_range);
+			return min( $top_range, $bottom_range, $initial_range );
 		};
 
 		$range     = $adjust_range( $range );
