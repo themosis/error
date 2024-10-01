@@ -11,6 +11,9 @@ final class FilePreview {
 
 	private int $total_rows;
 
+	/**
+	 * @var array<int, FilePreviewLine>
+	 */
 	private array $lines = [];
 
 	public function __construct(
@@ -26,6 +29,9 @@ final class FilePreview {
 		return $this->resource->key();
 	}
 
+	/**
+	 * @return array<int, FilePreviewLine>
+	 */
 	public function get_lines( int $range = 10 ): array {
 		if ( ! empty( $this->lines ) ) {
 			return $this->lines;
@@ -56,7 +62,11 @@ final class FilePreview {
 		while ( $current_row <= $end_row ) {
 			$this->resource->seek( $current_row - 1 );
 
-			$this->lines[ $current_row ] = htmlentities( $this->resource->fgets() );
+			$this->lines[] = new FilePreviewLine(
+				content: (string) $this->resource->fgets(),
+				number: $current_row,
+			);
+
 			++$current_row;
 		}
 
@@ -64,7 +74,7 @@ final class FilePreview {
 	}
 
 	public function row_number_length(): int {
-		$row_numbers        = array_keys( $this->get_lines() );
+		$row_numbers        = array_map( static fn ( FilePreviewLine $line ) => $line->number(), $this->get_lines() );
 		$highest_row_number = max( ...$row_numbers );
 
 		return mb_strlen( (string) $highest_row_number );

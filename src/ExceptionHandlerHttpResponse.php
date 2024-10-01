@@ -7,6 +7,7 @@ namespace Themosis\Components\Error;
 use Closure;
 use Themosis\Components\Error\Backtrace\Backtrace;
 use Themosis\Components\Error\Backtrace\FilePreview;
+use Themosis\Components\Error\Backtrace\FilePreviewLine;
 use Themosis\Components\Error\Backtrace\Frame;
 use Themosis\Components\Error\Backtrace\FrameTag;
 
@@ -19,7 +20,9 @@ final class ExceptionHandlerHttpResponse {
 
 	public function render( Issue $issue ): void {
 		$content = static function ( string $path, array $data = [] ) {
+            // phpcs:disable
 			extract( $data );
+            // phpcs:enable
 
 			return require $path;
 		};
@@ -63,14 +66,13 @@ final class ExceptionHandlerHttpResponse {
 
 	private function render_preview( FilePreview $file, callable $preview_callback, callable $line_callback ): string {
 		$lines = array_map(
-			static fn ( string $line, int $number ) => $line_callback(
-				class_name: $file->is_current_line( $number ) ? 'current-line' : '',
+			static fn ( FilePreviewLine $line ) => $line_callback(
+				class_name: $file->is_current_line( $line->number() ) ? 'current-line' : '',
 				length: $file->row_number_length(),
-				number: $number,
-				line: $line,
+				number: $line->number(),
+				line: $line->content(),
 			),
 			$file->get_lines(),
-			array_keys( $file->get_lines() )
 		);
 
 		return $preview_callback( implode( PHP_EOL, $lines ) );
