@@ -399,7 +399,7 @@
                     <?= $frames(
                         fn(string $frames) => <<<BACKTRACE
                             <div id="backtrace">{$frames}</div>
-                        BACKTRACE)(
+                        BACKTRACE,
                         fn(string $function, string $file, string $tags, string $preview) => <<<FRAME
                             <details class="frame">
                                 <summary>
@@ -411,11 +411,13 @@
                                 </summary>
                                 {$preview}
                             </details>
-                        FRAME)(
+                        FRAME,
                         fn(string $tagname) => <<<TAG
                             <span class="frame-identifier">{$tagname}</span>
-                        TAG)(
-                        fn(Closure $compose) => $compose($render_preview, $render_preview_line)); ?>
+                        TAG,
+                        $render_preview,
+                        $render_preview_line
+                    ); ?>
                 </section>
                 <section id="infos" class="section">
                     <h2 class="section-title">Additional Information</h2>
