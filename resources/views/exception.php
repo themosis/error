@@ -25,6 +25,7 @@
 
             --color-red-100: rgb(255, 240, 235);
             --color-red-200: rgb(250, 224, 212);
+            --color-red-300: rgb(255, 235, 240);
             --color-red-800: rgb(125, 30, 10);
 
             --color-yellow-500: rgb(255, 226, 115);
@@ -122,7 +123,7 @@
         }
 
         #issue {
-            background: var(--color-red-100);
+            background: linear-gradient(to bottom right, var(--color-red-100) 30%, var(--color-red-300));
             padding: 0;
         }
 

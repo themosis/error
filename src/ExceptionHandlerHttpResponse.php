@@ -20,9 +20,8 @@ final class ExceptionHandlerHttpResponse {
 
 	public function render( Issue $issue ): void {
 		$content = static function ( string $path, array $data = [] ) {
-            // phpcs:disable
+            // phpcs:ignore
 			extract( $data );
-            // phpcs:enable
 
 			return require $path;
 		};
