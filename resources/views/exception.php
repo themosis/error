@@ -17,6 +17,7 @@
             --color-blue-100: rgb(251, 253, 255);
             --color-blue-200: rgb(241, 243, 245);
             --color-blue-300: rgb(230, 245, 255);
+            --color-blue-400: rgb(155, 190, 195);
             --color-blue-500: rgb(0, 123, 255);
             --color-blue-700: rgb(0, 79, 168);
             --color-blue-800: rgb(24, 78, 116);
@@ -134,6 +135,10 @@
             border-radius: var(--radius);
             padding: var(--space-md);
             margin-bottom: var(--space-md);
+        }
+
+        .section:target {
+            background: linear-gradient(to bottom right, var(--color-gray-300), var(--color-blue-300));
         }
 
         .section-title {
@@ -296,28 +301,38 @@
         }
 
         .infos {
-            padding-top: var(--space-md);
+            margin-top: var(--space-md);
         }
 
         .info {
-            background: var(--color-white);
-            color: var(--color-blue-900);
-            padding-top: var(--space-sm);
-            padding-bottom: var(--space-sm);
+            margin-top: 0;
+            margin-bottom: 0;
+            margin-left: calc(-1 * var(--space-sm));
+            margin-right: calc(-1 * var(--space-sm));
+            display: block;
+            padding: var(--space-sm);
             border-radius: var(--radius);
+        }
+
+        .info:hover {
+            background: var(--color-blue-100);
         }
 
         .info-key {
-            background: var(--color-blue-900);
-            color: var(--color-white);
-            padding: var(--space-sm);
-            border-radius: var(--radius);
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
+            color: var(--color-blue-900);
+            border-bottom: 1px solid var(--color-blue-400);
+            padding-bottom: var(--space-sm);
+            font-weight: 700;
         }
 
         .info-value {
-            padding: var(--space-sm);
+            padding: var(--space-sm) 0;
+            margin-left: 0;
+        }
+
+        .info-value pre {
+            margin: 0;
+            white-space: pre-wrap;
         }
 
         @media screen and (min-width: 640px) {
@@ -357,6 +372,16 @@
             .section-title {
                 padding: var(--space-sm) var(--space-md);
             }
+
+            .information {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                column-gap: var(--space-md);
+            }
+
+            .info {
+                margin-top: var(--space-sm);
+            }
         }
     </style>
 </head>
@@ -370,7 +395,13 @@
                         <a href="#issue" title="Go to issue">Issue</a>
                     </li>
                     <li>
-                        <a href="#infos" title="Go to additional information">Infos</a>
+                        <a href="#general" title="Go to general">General</a>
+                    </li>
+                    <li>
+                        <a href="#request" title="Go to request">Request</a>
+                    </li>
+                    <li>
+                        <a href="#git" title="Go to git">Git</a>
                     </li>
                 </ul>
             </nav>
@@ -401,7 +432,7 @@
                             <div id="backtrace">{$frames}</div>
                         BACKTRACE,
                         fn(string $function, string $file, string $tags, string $preview) => <<<FRAME
-                            <details class="frame">
+                            <details name="backtrace" class="frame">
                                 <summary>
                                     <div class="frame-identifiers">
                                         <span class="frame-identifier frame-function">{$function}</span>
@@ -419,15 +450,59 @@
                         $render_preview_line
                     ); ?>
                 </section>
-                <section id="infos" class="section">
-                    <h2 class="section-title">Additional Information</h2>
-                    <div class="infos">
-                        <div class="info">
-                            <span class="info-key">PHP</span>
-                            <span class="info-value">8.2.13</span>
+                <div class="information">
+                    <section id="general" class="section">
+                        <h2 class="section-title">General</h2>
+                        <div class="infos">
+                            <dl class="info">
+                                <dt class="info-key">PHP</dt>
+                                <dd class="info-value"><pre>8.2.13</pre></dd>
+                            </dl>
+                            <dl class="info">
+                                <dt class="info-key">Occured At</dt>
+                                <dd class="info-value"><pre>02/10/2024</pre></dd >
+                            </dl>
+                            <dl class="info">
+                                <dt class="info-key">Timezone</dt>
+                                <dd class="info-value"><pre>UTC</pre></dd >
+                            </dl>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                    <section id="request" class="section">
+                        <h2 class="section-title">Request</h2>
+                        <div class="infos">
+                            <dl class="info">
+                                <dt class="info-key">Method</dt>
+                                <dd class="info-value"><pre>GET</pre></dd>
+                            </dl>
+                            <dl class="info">
+                                <dt class="info-key">Path</dt>
+                                <dd class="info-value"><pre>/</pre></dd>
+                            </dl>
+                            <dl class="info">
+                                <dt class="info-key">Query</dt>
+                                <dd class="info-value"><pre>&nbsp;</pre></dd >
+                            </dl>
+                            <dl class="info">
+                                <dt class="info-key">Headers</dt>
+                                <dd class="info-value"><pre>Accept: text/html<br>User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_17)<br>X-Forwarded-For: 127.0.0.1<br>X-Forwarded-Host: localhost<br>X-Forwarded-Proto: http</pre></dd>
+                            </dl>
+                        </div>
+                    </section>
+                    <section id="git" class="section">
+                        <h2 class="section-title">Git</h2>
+                        <div class="infos">
+                            <dl class="info">
+                                <dt class="info-key">Branch</dt>
+                                <dd class="info-value"><pre>fix/error-exception-renderer</pre></dd>
+                            </dl>
+                            <dl class="info">
+                                <dt class="info-key">User</dt>
+                                <dd class="info-value"><pre>jlambe</pre></dd >
+                            </dl>
+                        </div>
+                    </section>
+                </div>
             </div>
         </main>
         <!-- End Main -->
