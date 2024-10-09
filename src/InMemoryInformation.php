@@ -10,7 +10,11 @@ final class InMemoryInformation implements Information {
 	 */
 	private array $information = [];
 
-	public function add( InformationGroup $info ): void {
+	public function add( ?InformationGroup $info ): void {
+		if ( ! $info ) {
+			return;
+		}
+
 		$this->information[] = $info;
 	}
 

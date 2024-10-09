@@ -15,6 +15,7 @@ final class ExceptionHandlerHttpResponse {
 	public function __construct(
 		private string $view_path,
 		private Backtrace $backtrace,
+		private Information $information,
 	) {
 	}
 
@@ -52,6 +53,46 @@ final class ExceptionHandlerHttpResponse {
 					);
 
 					return $frames_callback( implode( PHP_EOL, $frames ) );
+				},
+				'information'     => function ( Closure $information_callback, Closure $infogroup_callback, Closure $info_callback ) {
+					$information = array_map(
+						static function ( InformationGroup $group ) use ( $infogroup_callback, $info_callback ) {
+							$infos = array_map(
+								static function ( Info $info ) use ( $info_callback ) {
+									return $info_callback(
+										label: $info->name(),
+										value: $info->value(),
+									);
+								},
+								$group->get_information()
+							);
+
+							return $infogroup_callback(
+								slug: $group->slug(),
+								title: $group->title(),
+								infos: implode( PHP_EOL, $infos ),
+							);
+						},
+						$this->information->get_information_by_priority(),
+					);
+
+					return $information_callback( implode( PHP_EOL, $information ) );
+				},
+				'navigation'      => function ( Closure $navigation_callback ) {
+					$items = array_reduce(
+						$this->information->get_information_by_priority(),
+						static function ( array $carry, InformationGroup $item ) use ( $navigation_callback ) {
+							$carry[] = $navigation_callback(
+								id: $item->slug(),
+								title: $item->title(),
+							);
+
+							return $carry;
+						},
+						[ $navigation_callback( id: 'issue', title: 'Issue' ) ]
+					);
+
+					return implode( PHP_EOL, $items );
 				},
 			]
 		);

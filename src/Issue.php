@@ -45,12 +45,12 @@ final class Issue {
 		return Level::Error;
 	}
 
-	public function info(): AdditionalInformation {
-		if ( $this->exception instanceof Contextual ) {
-			return $this->exception->context();
+	public function info(): ?InformationGroup {
+		if ( $this->exception instanceof AdditionalInformation ) {
+			return $this->exception->information();
 		}
 
-		return new AdditionalInformation();
+		return null;
 	}
 
 	public function exception(): Throwable {

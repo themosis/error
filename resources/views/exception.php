@@ -376,7 +376,7 @@
 
             .information {
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(40%, 1fr));
                 column-gap: var(--space-md);
             }
 
@@ -392,18 +392,13 @@
         <aside id="sidebar">
             <nav>
                 <ul class="nav">
-                    <li>
-                        <a href="#issue" title="Go to issue">Issue</a>
-                    </li>
-                    <li>
-                        <a href="#general" title="Go to general">General</a>
-                    </li>
-                    <li>
-                        <a href="#request" title="Go to request">Request</a>
-                    </li>
-                    <li>
-                        <a href="#git" title="Go to git">Git</a>
-                    </li>
+                    <?= $navigation(
+                        fn (string $id, string $title) => <<<NAV
+                            <li>
+                                <a href="#{$id}" title="Go To: {$title}">{$title}</a>
+                            </li>
+                        NAV,
+                    ) ?>
                 </ul>
             </nav>
         </aside>
@@ -451,59 +446,23 @@
                         $render_preview_line
                     ); ?>
                 </section>
-                <div class="information">
-                    <section id="general" class="section">
-                        <h2 class="section-title">General</h2>
-                        <div class="infos">
-                            <dl class="info">
-                                <dt class="info-key">PHP</dt>
-                                <dd class="info-value"><pre>8.2.13</pre></dd>
-                            </dl>
-                            <dl class="info">
-                                <dt class="info-key">Occured At</dt>
-                                <dd class="info-value"><pre>02/10/2024</pre></dd >
-                            </dl>
-                            <dl class="info">
-                                <dt class="info-key">Timezone</dt>
-                                <dd class="info-value"><pre>UTC</pre></dd >
-                            </dl>
-                        </div>
-                    </section>
-                    <section id="request" class="section">
-                        <h2 class="section-title">Request</h2>
-                        <div class="infos">
-                            <dl class="info">
-                                <dt class="info-key">Method</dt>
-                                <dd class="info-value"><pre>GET</pre></dd>
-                            </dl>
-                            <dl class="info">
-                                <dt class="info-key">Path</dt>
-                                <dd class="info-value"><pre>/</pre></dd>
-                            </dl>
-                            <dl class="info">
-                                <dt class="info-key">Query</dt>
-                                <dd class="info-value"><pre>&nbsp;</pre></dd >
-                            </dl>
-                            <dl class="info">
-                                <dt class="info-key">Headers</dt>
-                                <dd class="info-value"><pre>Accept: text/html<br>User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_17)<br>X-Forwarded-For: 127.0.0.1<br>X-Forwarded-Host: localhost<br>X-Forwarded-Proto: http</pre></dd>
-                            </dl>
-                        </div>
-                    </section>
-                    <section id="git" class="section">
-                        <h2 class="section-title">Git</h2>
-                        <div class="infos">
-                            <dl class="info">
-                                <dt class="info-key">Branch</dt>
-                                <dd class="info-value"><pre>fix/error-exception-renderer</pre></dd>
-                            </dl>
-                            <dl class="info">
-                                <dt class="info-key">User</dt>
-                                <dd class="info-value"><pre>jlambe</pre></dd >
-                            </dl>
-                        </div>
-                    </section>
-                </div>
+                <?= $information(
+                    fn (string $infogroups) => <<<INFORMATION
+                        <div class="information">{$infogroups}</div>
+                    INFORMATION,
+                    fn (string $slug, string $title, string $infos) => <<<INFOGROUP
+                        <section id="{$slug}" class="section">
+                            <h2 class="section-title">{$title}</h2>
+                            <div class="infos">{$infos}</div>
+                        </section>
+                    INFOGROUP,
+                    fn (string $label, string $value) => <<<INFO
+                        <dl class="info">
+                            <dt class="info-key">{$label}</dt>
+                            <dd class="info-value"><pre>{$value}</pre></dd >
+                        </dl>
+                    INFO,
+                ); ?>
             </div>
         </main>
         <!-- End Main -->

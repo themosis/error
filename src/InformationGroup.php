@@ -23,6 +23,10 @@ final class InformationGroup {
 		return strtolower( str_replace( ' ', '-', $this->name ) );
 	}
 
+	public function title(): string {
+		return ucfirst( $this->name );
+	}
+
 	public function priority(): int {
 		return $this->priority;
 	}
