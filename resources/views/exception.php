@@ -160,6 +160,7 @@
             margin-top: var(--space-md);
             margin-bottom: var(--space-sm);
             color: var(--color-blue-900);
+            word-break: break-word;
         }
 
         .file {
@@ -308,15 +309,8 @@
         .info {
             margin-top: 0;
             margin-bottom: 0;
-            margin-left: calc(-1 * var(--space-sm));
-            margin-right: calc(-1 * var(--space-sm));
             display: block;
-            padding: var(--space-sm);
-            border-radius: var(--radius);
-        }
-
-        .info:hover {
-            background: var(--color-blue-100);
+            padding: var(--space-sm) 0;
         }
 
         .info-key {
@@ -334,6 +328,7 @@
         .info-value pre {
             margin: 0;
             white-space: pre-wrap;
+            word-break: break-word;
         }
 
         @media screen and (min-width: 640px) {
@@ -382,6 +377,14 @@
 
             .info {
                 margin-top: var(--space-sm);
+                margin-left: calc(-1 * var(--space-sm));
+                margin-right: calc(-1 * var(--space-sm));
+                padding: var(--space-sm);
+                border-radius: var(--radius);
+            }
+
+            .info:hover {
+                background: var(--color-blue-100);
             }
         }
     </style>
