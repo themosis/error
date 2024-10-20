@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2024 Julien Lambé <julien@themosis.com>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 declare(strict_types=1);
 
 namespace Themosis\Components\Error\Backtrace;
@@ -75,7 +79,7 @@ final class FilePreview {
 
 	public function row_number_length(): int {
 		$row_numbers        = array_map( static fn ( FilePreviewLine $line ) => $line->number(), $this->get_lines() );
-		$highest_row_number = max( ...$row_numbers );
+		$highest_row_number = max( $row_numbers );
 
 		return mb_strlen( (string) $highest_row_number );
 	}
