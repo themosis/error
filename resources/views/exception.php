@@ -14,7 +14,7 @@
             --color-gray-500: rgb(141, 153, 155);
             --color-gray-600: rgb(121, 123, 127);
             --color-gray-800: rgb(60, 65, 65);
-            --color-gray-900: rgb(38, 37, 37);
+            --color-gray-900: rgb(30, 35, 35);
 
             --color-blue-100: rgb(251, 253, 255);
             --color-blue-200: rgb(241, 243, 245);
@@ -30,7 +30,7 @@
             --color-red-300: rgb(255, 235, 240);
             --color-red-700: rgb(125, 30, 10);
             --color-red-800: rgb(90, 40, 55);
-            --color-red-900: rgb(40, 30, 30);
+            --color-red-900: rgb(70, 30, 55);
 
             --color-yellow-500: rgb(255, 226, 115);
 
@@ -45,12 +45,13 @@
             --radius: 0.3125rem;
 
             --sidebar-width: 44px;
-            
+
             color-scheme: light dark;
         }
 
         body {
-            background-color: var(--color-gray-100);
+            --_body-bg: var(--body-bg, var(--color-gray-100));
+            background-color: var(--_body-bg);
             margin: var(--space-sm);
             font-family: Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;
             font-size: 1rem;
@@ -77,11 +78,13 @@
         }
 
         #sidebar {
+            --_sidebar-bg: var(--sidebar-bg, var(--color-blue-900));
+            --_sidebar-width: var(--sidebar-width);
             position: fixed;
             z-index: 100;
-            background-color: var(--color-blue-900);
+            background-color: var(--_sidebar-bg);
             height: calc(100% - (var(--space-sm) * 2));
-            width: var(--sidebar-width);
+            width: var(--_sidebar-width);
             flex: 0 0 auto;
             border-radius: var(--radius);
         }
@@ -129,7 +132,7 @@
         }
 
         #issue {
-            background: linear-gradient(to bottom right, var(--color-red-100) 30%, var(--color-red-300));
+            --section-bg: linear-gradient(to bottom right, var(--color-red-100) 30%, var(--color-red-300));
             padding: 0;
         }
 
@@ -138,14 +141,15 @@
         }
 
         .section {
-            background: var(--color-gray-300);
+            --_section-bg: var(--section-bg, var(--color-gray-300));
+            background: var(--_section-bg);
             border-radius: var(--radius);
             padding: var(--space-md);
             margin-bottom: var(--space-md);
         }
 
         .section:target {
-            background: linear-gradient(to bottom right, var(--color-gray-300), var(--color-blue-300));
+            --section-bg: linear-gradient(to bottom right, var(--color-gray-300), var(--color-blue-300));
         }
 
         .section-title {
@@ -196,12 +200,12 @@
         .line {
             display: inline-block;
             width: 100%;
-            background: var(--color-white);
+            background: var(--color-gray-300);
             line-height: 1.625;
         }
 
         .line:nth-of-type(even) {
-            background: var(--color-gray-300);
+            background: var(--color-white);
         }
 
         .line:hover {
@@ -295,17 +299,19 @@
         }
 
         .frame-identifier {
+            --_identifier-bg: var(--identifier-bg, var(--color-blue-300));
+            --_identifier-color: var(--identifier-color, var(--color-blue-900));
             display: inline-block;
-            background: var(--color-blue-300);
-            color: var(--color-blue-900);
+            background: var(--_identifier-bg);
+            color: var(--_identifier-color);
             border-radius: var(--radius-sm);
             padding: var(--space-xs) var(--space-sm);
             word-break: break-all;
         }
 
         .frame-function {
-            background: var(--color-blue-900);
-            color: var(--color-white);
+            --identifier-bg: var(--color-blue-900);
+            --identifier-color: var(--color-white);
         }
 
         .infos {
@@ -395,24 +401,17 @@
         }
 
         @media (prefers-color-scheme: dark) {
-            body {
-                background-color: var(--color-gray-900);
+            :root {
+                --body-bg: var(--color-gray-900);
+                --section-bg: var(--color-gray-800);
             }
 
             #issue {
-                background: linear-gradient(to bottom right, var(--color-red-800) 30%, var(--color-red-900));
-            }
-
-            .section {
-                background: var(--color-gray-800);
+                --section-bg: linear-gradient(to bottom right, var(--color-red-800) 30%, var(--color-red-900));
             }
 
             .section:target {
-                background: linear-gradient(to bottom right, var(--color-gray-800), var(--color-blue-800));
-            }
-
-            #sidebar {
-                background-color: var(--color-blue-900);
+                --section-bg: linear-gradient(to bottom right, var(--color-gray-800), var(--color-blue-800));
             }
             
             #backtrace {
@@ -424,7 +423,7 @@
             }
 
             .file {
-                color: var(--color-blue-200);
+                color: var(--color-blue-300);
             }
 
             .preview {
@@ -474,14 +473,9 @@
                 color: var(--color-white);
             }
 
-            .frame-identifier {
-                background: var(--color-blue-200);
-                color: var(--color-blue-900);
-            }
-
             .frame-function {
-                background: var(--color-blue-300);
-                color: var(--color-blue-900);
+                --identifier-bg: var(--color-gray-900);
+                --identifier-color: var(--color-blue-300);
             }
 
             .info-key {
