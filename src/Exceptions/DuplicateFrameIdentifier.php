@@ -10,5 +10,6 @@ namespace Themosis\Components\Error\Exceptions;
 
 use LogicException;
 
-final class DuplicateFrameIdentifier extends LogicException {
+final class DuplicateFrameIdentifier extends LogicException
+{
 }

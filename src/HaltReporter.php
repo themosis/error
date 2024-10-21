@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Themosis\Components\Error;
 
-interface HaltReporter extends Reporter {
-	public function stop( Issue $issue ): bool;
+interface HaltReporter extends Reporter
+{
+    public function stop(Issue $issue): bool;
 }

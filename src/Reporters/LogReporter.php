@@ -13,23 +13,25 @@ use Themosis\Components\Error\Info;
 use Themosis\Components\Error\Issue;
 use Themosis\Components\Error\Reporter;
 
-final class LogReporter implements Reporter {
-	public function __construct(
-		private LoggerInterface $logger,
-	) {
-	}
+final class LogReporter implements Reporter
+{
+    public function __construct(
+        private LoggerInterface $logger,
+    ) {
+    }
 
-	public function report( Issue $issue ): void {
-		$this->logger->log(
-			level: $issue->level()->value,
-			message: $issue->message(),
-			context: array_reduce(
-				$issue->info()?->get_information() ?? [],
-				static function ( array $carry, Info $info ) {
-					$carry[ $info->name() ] = $info->value();
-				},
-				[]
-			),
-		);
-	}
+    public function report(Issue $issue): void
+    {
+        $this->logger->log(
+            level: $issue->level()->value,
+            message: $issue->message(),
+            context: array_reduce(
+                $issue->info()?->get_information() ?? [],
+                static function (array $carry, Info $info) {
+                    $carry[ $info->name() ] = $info->value();
+                },
+                []
+            ),
+        );
+    }
 }

@@ -10,15 +10,17 @@ namespace Themosis\Components\Error;
 
 use Throwable;
 
-final class ExceptionHandler {
-	public function __construct(
-		private ReportHandler $report_handler,
-	) {
-	}
+final class ExceptionHandler
+{
+    public function __construct(
+        private ReportHandler $report_handler,
+    ) {
+    }
 
-	public function __invoke( Throwable $exception ) {
-		$this->report_handler
-			->capture( Issue::from_exception( $exception ) )
-			->publish();
-	}
+    public function __invoke(Throwable $exception)
+    {
+        $this->report_handler
+            ->capture(Issue::from_exception($exception))
+            ->publish();
+    }
 }

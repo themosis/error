@@ -13,10 +13,12 @@ use Themosis\Components\Error\AdditionalInformation;
 use Themosis\Components\Error\InformationGroup;
 use Themosis\Components\Error\TextInfo;
 
-final class FakeException extends Exception implements AdditionalInformation {
-	public function information(): InformationGroup {
-		return ( new InformationGroup( 'Order' ) )
-			->add( new TextInfo( 'Order ID', 'ORD-1234' ) )
-			->add( new TextInfo( 'Customer ID', 'USR-1234' ) );
-	}
+final class FakeException extends Exception implements AdditionalInformation
+{
+    public function information(): InformationGroup
+    {
+        return ( new InformationGroup('Order') )
+            ->add(new TextInfo('Order ID', 'ORD-1234'))
+            ->add(new TextInfo('Customer ID', 'USR-1234'));
+    }
 }

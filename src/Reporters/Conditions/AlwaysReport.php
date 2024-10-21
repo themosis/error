@@ -11,8 +11,10 @@ namespace Themosis\Components\Error\Reporters\Conditions;
 use Themosis\Components\Error\Issue;
 use Themosis\Components\Error\ReportCondition;
 
-final class AlwaysReport implements ReportCondition {
-	public function can( Issue $issue ): bool {
-		return true;
-	}
+final class AlwaysReport implements ReportCondition
+{
+    public function can(Issue $issue): bool
+    {
+        return true;
+    }
 }

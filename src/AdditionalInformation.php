@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Themosis\Components\Error;
 
-interface AdditionalInformation {
-	public function information(): InformationGroup;
+interface AdditionalInformation
+{
+    public function information(): InformationGroup;
 }

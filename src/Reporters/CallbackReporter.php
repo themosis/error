@@ -12,13 +12,15 @@ use Closure;
 use Themosis\Components\Error\Issue;
 use Themosis\Components\Error\Reporter;
 
-final class CallbackReporter implements Reporter {
-	public function __construct(
-		private Closure $callback,
-	) {
-	}
+final class CallbackReporter implements Reporter
+{
+    public function __construct(
+        private Closure $callback,
+    ) {
+    }
 
-	public function report( Issue $issue ): void {
-		( $this->callback )( $issue );
-	}
+    public function report(Issue $issue): void
+    {
+        ( $this->callback )($issue);
+    }
 }

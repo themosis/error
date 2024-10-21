@@ -11,13 +11,15 @@ namespace Themosis\Components\Error\Reporters\Conditions;
 use Themosis\Components\Error\Issue;
 use Themosis\Components\Error\ReportCondition;
 
-final class Dont implements ReportCondition {
-	public function __construct(
-		private ReportCondition $condition,
-	) {
-	}
+final class Dont implements ReportCondition
+{
+    public function __construct(
+        private ReportCondition $condition,
+    ) {
+    }
 
-	public function can( Issue $issue ): bool {
-		return ! $this->condition->can( $issue );
-	}
+    public function can(Issue $issue): bool
+    {
+        return ! $this->condition->can($issue);
+    }
 }

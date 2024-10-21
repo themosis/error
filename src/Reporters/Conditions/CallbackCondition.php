@@ -12,13 +12,15 @@ use Closure;
 use Themosis\Components\Error\Issue;
 use Themosis\Components\Error\ReportCondition;
 
-final class CallbackCondition implements ReportCondition {
-	public function __construct(
-		private Closure $callback,
-	) {
-	}
+final class CallbackCondition implements ReportCondition
+{
+    public function __construct(
+        private Closure $callback,
+    ) {
+    }
 
-	public function can( Issue $issue ): bool {
-		return ( $this->callback )( $issue );
-	}
+    public function can(Issue $issue): bool
+    {
+        return ( $this->callback )($issue);
+    }
 }

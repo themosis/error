@@ -10,5 +10,6 @@ namespace Themosis\Components\Error\Exceptions;
 
 use InvalidArgumentException;
 
-final class InvalidFrameTagArgument extends InvalidArgumentException {
+final class InvalidFrameTagArgument extends InvalidArgumentException
+{
 }

@@ -11,91 +11,101 @@ namespace Themosis\Components\Error\Backtrace;
 use Stringable;
 use Throwable;
 
-final class Backtrace implements Stringable {
-	/**
-	 * @var array<int, Frame>
-	 */
-	private array $frames = [];
+final class Backtrace implements Stringable
+{
+    /**
+     * @var array<int, Frame>
+     */
+    private array $frames = [];
 
-	public function __construct(
-		private FrameIdentifiers $frame_identifiers,
-	) {}
+    public function __construct(
+        private FrameIdentifiers $frameIdentifiers,
+    ) {
+    }
 
-	public static function debug( FrameIdentifiers $frame_identifiers = null ): self {
-		$self = new self(
-			frame_identifiers: $frame_identifiers ?? new InMemoryFrameIdentifiers(),
-		);
+    public static function debug(FrameIdentifiers $frameIdentifiers = null): self
+    {
+        $self = new self(
+            frameIdentifiers: $frameIdentifiers ?? new InMemoryFrameIdentifiers(),
+        );
 
-		$debug_backtrace_without_first_frame = ( static function ( array $frames ): array {
-			return array_slice( $frames, 1 );
-		} )( debug_backtrace() );
+        $debugBacktraceWithoutFirstFrame = ( static function (array $frames): array {
+            return array_slice($frames, 1);
+        } )(debug_backtrace());
 
-		return $self->capture(
-			frames: $debug_backtrace_without_first_frame,
-		);
-	}
+        return $self->capture(
+            frames: $debugBacktraceWithoutFirstFrame,
+        );
+    }
 
-	public function capture( array $frames ): self {
-		$this->frames = array_map( $this->make_frame( ... ), $frames );
+    public function capture(array $frames): self
+    {
+        $this->frames = array_map($this->makeFrame(...), $frames);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function capture_exception( Throwable $exception ): self {
-		return $this->capture(
-			frames: $exception->getTrace(),
-		);
-	}
+    public function captureException(Throwable $exception): self
+    {
+        return $this->capture(
+            frames: $exception->getTrace(),
+        );
+    }
 
-	public function frames(): array {
-		return $this->frames;
-	}
+    public function frames(): array
+    {
+        return $this->frames;
+    }
 
-	public function filter( callable $filter_callback ): self {
-		$filtered_backtrace = new self(
-			frame_identifiers: $this->frame_identifiers,
-		);
+    public function filter(callable $filterCallback): self
+    {
+        $filteredBacktrace = new self(
+            frameIdentifiers: $this->frameIdentifiers,
+        );
 
-		$filtered_frames = array_map( fn( Frame $frame ) => $frame->as_array(), array_filter( $this->frames, $filter_callback ) );
-		$filtered_backtrace->capture( $filtered_frames );
+        $filteredFrames = array_map(fn(Frame $frame) => $frame->as_array(), array_filter($this->frames, $filterCallback));
+        $filteredBacktrace->capture($filteredFrames);
 
-		return $filtered_backtrace;
-	}
+        return $filteredBacktrace;
+    }
 
-	private function make_frame( array $frame_args ): Frame {
-		$frame = new Frame( $frame_args );
+    private function makeFrame(array $frameArgs): Frame
+    {
+        $frame = new Frame($frameArgs);
 
-		$applicable_identifiers = array_filter(
-			$this->frame_identifiers->all(),
-			function ( FrameIdentifier $frame_identifier ) use ( $frame ) {
-				return $frame_identifier->identify( $frame );
-			}
-		);
+        $applicableIdentifiers = array_filter(
+            $this->frameIdentifiers->all(),
+            function (FrameIdentifier $frameIdentifier) use ($frame) {
+                return $frameIdentifier->identify($frame);
+            }
+        );
 
-		$frame->add_tag( ...array_map( fn( FrameIdentifier $frame_identifier ) => $frame_identifier->tag(), $applicable_identifiers ) );
+        $frame->add_tag(...array_map(fn(FrameIdentifier $frameIdentifier) => $frameIdentifier->tag(), $applicableIdentifiers));
 
-		return $frame;
-	}
+        return $frame;
+    }
 
-	public function __toString(): string {
-		return implode(
-			PHP_EOL,
-			array_map(
-				function ( Frame $frame, int $index ) {
-					return sprintf( '[%d] %s', $index, (string) $frame );
-				},
-				$this->frames,
-				array_keys( $this->frames )
-			)
-		);
-	}
+    public function __toString(): string
+    {
+        return implode(
+            PHP_EOL,
+            array_map(
+                function (Frame $frame, int $index) {
+                    return sprintf('[%d] %s', $index, (string) $frame);
+                },
+                $this->frames,
+                array_keys($this->frames)
+            )
+        );
+    }
 
-	public function __debugInfo() {
-		return array_map(
-			function ( Frame $frame ) {
-				return (string) $frame;
-			},
-			$this->frames,
-		);
-	}
+    public function __debugInfo()
+    {
+        return array_map(
+            function (Frame $frame) {
+                return (string) $frame;
+            },
+            $this->frames,
+        );
+    }
 }

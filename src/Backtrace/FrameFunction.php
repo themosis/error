@@ -10,5 +10,6 @@ namespace Themosis\Components\Error\Backtrace;
 
 use Stringable;
 
-interface FrameFunction extends Stringable {
+interface FrameFunction extends Stringable
+{
 }

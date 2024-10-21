@@ -12,17 +12,20 @@ use Themosis\Components\Error\HaltReporter;
 use Themosis\Components\Error\Issue;
 use Themosis\Components\Error\Reporter;
 
-final class AlwaysStopAfter implements HaltReporter {
-	public function __construct(
-		private Reporter $reporter,
-	) {
-	}
+final class AlwaysStopAfter implements HaltReporter
+{
+    public function __construct(
+        private Reporter $reporter,
+    ) {
+    }
 
-	public function stop( Issue $issue ): bool {
-		return true;
-	}
+    public function stop(Issue $issue): bool
+    {
+        return true;
+    }
 
-	public function report( Issue $issue ): void {
-		$this->reporter->report( $issue );
-	}
+    public function report(Issue $issue): void
+    {
+        $this->reporter->report($issue);
+    }
 }

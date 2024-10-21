@@ -27,334 +27,343 @@ use Themosis\Components\Error\Reporters\LogReporter;
 use Themosis\Components\Error\Reporters\StdoutReporter;
 use Themosis\Components\Error\ReportHandler;
 
-final class ReportHandlerTest extends TestCase {
-	#[Test]
-	public function it_can_report_an_issue_on_single_registered_reporter(): void {
-		$frame_identifiers = new InMemoryFrameIdentifiers();
-		$backtrace         = new Backtrace( $frame_identifiers );
+final class ReportHandlerTest extends TestCase
+{
+    #[Test]
+    public function it_can_report_an_issue_on_single_registered_reporter(): void
+    {
+        $frame_identifiers = new InMemoryFrameIdentifiers();
+        $backtrace         = new Backtrace($frame_identifiers);
 
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new StdoutReporter( $backtrace )
-		);
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new StdoutReporter($backtrace)
+        );
 
-		$issue                    = Issue::from_exception(
-			exception: $exception = new Exception( 'There was an error...' ),
-			occured_at: $date     = new DateTimeImmutable( 'now' ),
-		);
+        $issue                    = Issue::from_exception(
+            exception: $exception = new Exception('There was an error...'),
+            occured_at: $date     = new DateTimeImmutable('now'),
+        );
 
-		$issues = new InMemoryIssues();
-		$issues->add( $issue );
+        $issues = new InMemoryIssues();
+        $issues->add($issue);
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: $issues,
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: $issues,
+        );
 
-		ob_start();
-		$handler->publish();
-		$stdout = ob_get_clean();
+        ob_start();
+        $handler->publish();
+        $stdout = ob_get_clean();
 
-		$expected = sprintf(
-			"[%s] %s\n%s\n",
-			$date->format( DateTimeImmutable::W3C ),
-			$exception->getMessage(),
-			(string) $backtrace
-		);
+        $expected = sprintf(
+            "[%s] %s\n%s\n",
+            $date->format(DateTimeImmutable::W3C),
+            $exception->getMessage(),
+            (string) $backtrace
+        );
 
-		$this->assertSame( $expected, $stdout );
-	}
+        $this->assertSame($expected, $stdout);
+    }
 
-	#[Test]
-	public function it_can_report_an_issue_on_multiple_registered_reporters(): void {
-		$frame_identifiers = new InMemoryFrameIdentifiers();
-		$backtrace         = new Backtrace( $frame_identifiers );
+    #[Test]
+    public function it_can_report_an_issue_on_multiple_registered_reporters(): void
+    {
+        $frame_identifiers = new InMemoryFrameIdentifiers();
+        $backtrace         = new Backtrace($frame_identifiers);
 
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new StdoutReporter( $backtrace )
-		);
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new StdoutReporter( $backtrace )
-		);
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new StdoutReporter( $backtrace )
-		);
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new StdoutReporter($backtrace)
+        );
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new StdoutReporter($backtrace)
+        );
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new StdoutReporter($backtrace)
+        );
 
-		$issues                       = new InMemoryIssues();
-		$issues->add(
-			issue: Issue::from_exception(
-				exception: $exception = new Exception( 'There was an error...' ),
-				occured_at: $date     = new DateTimeImmutable( 'now' ),
-			),
-		);
+        $issues                       = new InMemoryIssues();
+        $issues->add(
+            issue: Issue::from_exception(
+                exception: $exception = new Exception('There was an error...'),
+                occured_at: $date     = new DateTimeImmutable('now'),
+            ),
+        );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: $issues,
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: $issues,
+        );
 
-		ob_start();
-		$handler->publish();
-		$stdout = ob_get_clean();
+        ob_start();
+        $handler->publish();
+        $stdout = ob_get_clean();
 
-		$expected = sprintf(
-			"[%s] %s\n%s\n",
-			$date->format( DateTimeImmutable::W3C ),
-			$exception->getMessage(),
-			(string) $backtrace
-		);
+        $expected = sprintf(
+            "[%s] %s\n%s\n",
+            $date->format(DateTimeImmutable::W3C),
+            $exception->getMessage(),
+            (string) $backtrace
+        );
 
-		$this->assertSame( implode( '', [ $expected, $expected, $expected ] ), $stdout );
-	}
+        $this->assertSame(implode('', [ $expected, $expected, $expected ]), $stdout);
+    }
 
-	#[Test]
-	public function it_can_report_an_issue_to_local_log_file(): void {
-		$logger = new Logger( 'APP' );
-		$logger->pushHandler( new StreamHandler( stream: $path = __DIR__ . '/test.log' ) );
+    #[Test]
+    public function it_can_report_an_issue_to_local_log_file(): void
+    {
+        $logger = new Logger('APP');
+        $logger->pushHandler(new StreamHandler(stream: $path = __DIR__ . '/test.log'));
 
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new LogReporter( $logger )
-		);
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new LogReporter($logger)
+        );
 
-		$issues = new InMemoryIssues();
-		$issues->add(
-			issue: Issue::from_exception(
-				exception: new Exception( 'Something went wrong!' ),
-				occured_at: new DateTimeImmutable( 'now' ),
-			),
-		);
+        $issues = new InMemoryIssues();
+        $issues->add(
+            issue: Issue::from_exception(
+                exception: new Exception('Something went wrong!'),
+                occured_at: new DateTimeImmutable('now'),
+            ),
+        );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: $issues,
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: $issues,
+        );
 
-		$handler->publish();
+        $handler->publish();
 
-		$this->assertTrue( file_exists( $path ) );
-		$this->assertNotEmpty( file_get_contents( $path ) );
+        $this->assertTrue(file_exists($path));
+        $this->assertNotEmpty(file_get_contents($path));
 
-		unlink( $path );
-	}
+        unlink($path);
+    }
 
-	#[Test]
-	public function it_can_report_multiple_issues_on_single_reporter(): void {
-		$frame_identifiers = new InMemoryFrameIdentifiers();
-		$backtrace         = new Backtrace( $frame_identifiers );
+    #[Test]
+    public function it_can_report_multiple_issues_on_single_reporter(): void
+    {
+        $frame_identifiers = new InMemoryFrameIdentifiers();
+        $backtrace         = new Backtrace($frame_identifiers);
 
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new StdoutReporter( $backtrace )
-		);
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new StdoutReporter($backtrace)
+        );
 
-		$issues                         = new InMemoryIssues();
-		$issues->add(
-			issue: Issue::from_exception(
-				exception: $exception_a = new Exception( 'Error AAA' ),
-				occured_at: $date_a     = new DateTimeImmutable( '2 days ago' ),
-			),
-		);
-		$issues->add(
-			issue: Issue::from_exception(
-				exception: $exception_b = new Exception( 'Error BBB' ),
-				occured_at: $date_b     = new DateTimeImmutable( 'now' ),
-			),
-		);
+        $issues                         = new InMemoryIssues();
+        $issues->add(
+            issue: Issue::from_exception(
+                exception: $exception_a = new Exception('Error AAA'),
+                occured_at: $date_a     = new DateTimeImmutable('2 days ago'),
+            ),
+        );
+        $issues->add(
+            issue: Issue::from_exception(
+                exception: $exception_b = new Exception('Error BBB'),
+                occured_at: $date_b     = new DateTimeImmutable('now'),
+            ),
+        );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: $issues,
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: $issues,
+        );
 
-		ob_start();
-		$handler->publish();
-		$stdout = ob_get_clean();
+        ob_start();
+        $handler->publish();
+        $stdout = ob_get_clean();
 
-		$expected_a = sprintf(
-			"[%s] %s\n%s\n",
-			$date_a->format( DateTimeImmutable::W3C ),
-			$exception_a->getMessage(),
-			(string) $backtrace
-		);
+        $expected_a = sprintf(
+            "[%s] %s\n%s\n",
+            $date_a->format(DateTimeImmutable::W3C),
+            $exception_a->getMessage(),
+            (string) $backtrace
+        );
 
-		$expected_b = sprintf(
-			"[%s] %s\n%s\n",
-			$date_b->format( DateTimeImmutable::W3C ),
-			$exception_b->getMessage(),
-			(string) $backtrace
-		);
+        $expected_b = sprintf(
+            "[%s] %s\n%s\n",
+            $date_b->format(DateTimeImmutable::W3C),
+            $exception_b->getMessage(),
+            (string) $backtrace
+        );
 
-		$this->assertSame( implode( '', [ $expected_a, $expected_b ] ), $stdout );
-	}
+        $this->assertSame(implode('', [ $expected_a, $expected_b ]), $stdout);
+    }
 
-	#[Test]
-	public function it_can_report_multiple_issues_on_multiple_reporters(): void {
-		$frame_identifiers = new InMemoryFrameIdentifiers();
-		$backtrace         = new Backtrace( $frame_identifiers );
+    #[Test]
+    public function it_can_report_multiple_issues_on_multiple_reporters(): void
+    {
+        $frame_identifiers = new InMemoryFrameIdentifiers();
+        $backtrace         = new Backtrace($frame_identifiers);
 
-		$logger = new Logger( 'TEST' );
-		$logger->pushHandler( new StreamHandler( 'php://output' ) );
+        $logger = new Logger('TEST');
+        $logger->pushHandler(new StreamHandler('php://output'));
 
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new StdoutReporter( $backtrace )
-		);
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new LogReporter( $logger )
-		);
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new StdoutReporter($backtrace)
+        );
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new LogReporter($logger)
+        );
 
-		$issues = new InMemoryIssues();
-		$issues->add(
-			issue: Issue::from_exception(
-				exception: new Exception( 'Error AAA' ),
-				occured_at: new DateTimeImmutable( '2 days ago' ),
-			),
-		);
-		$issues->add(
-			issue: Issue::from_exception(
-				exception: new Exception( 'Error BBB' ),
-				occured_at: new DateTimeImmutable( 'now' ),
-			),
-		);
+        $issues = new InMemoryIssues();
+        $issues->add(
+            issue: Issue::from_exception(
+                exception: new Exception('Error AAA'),
+                occured_at: new DateTimeImmutable('2 days ago'),
+            ),
+        );
+        $issues->add(
+            issue: Issue::from_exception(
+                exception: new Exception('Error BBB'),
+                occured_at: new DateTimeImmutable('now'),
+            ),
+        );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: $issues,
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: $issues,
+        );
 
-		ob_start();
-		$handler->publish();
-		$stdout = ob_get_clean();
+        ob_start();
+        $handler->publish();
+        $stdout = ob_get_clean();
 
-		preg_match_all( '/Error AAA/', $stdout, $matches_a );
-		preg_match_all( '/Error BBB/', $stdout, $matches_b );
+        preg_match_all('/Error AAA/', $stdout, $matches_a);
+        preg_match_all('/Error BBB/', $stdout, $matches_b);
 
-		$this->assertCount( 2, array_shift( $matches_a ) );
-		$this->assertCount( 2, array_shift( $matches_b ) );
-	}
+        $this->assertCount(2, array_shift($matches_a));
+        $this->assertCount(2, array_shift($matches_b));
+    }
 
-	#[Test]
-	public function it_can_report_an_issue_using_a_closure(): void {
-		$reported         = false;
-		$reported_message = '';
+    #[Test]
+    public function it_can_report_an_issue_using_a_closure(): void
+    {
+        $reported         = false;
+        $reported_message = '';
 
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new CallbackReporter(
-				static function ( Issue $issue ) use ( &$reported, &$reported_message ) {
-					$reported         = true;
-					$reported_message = $issue->message();
-				}
-			)
-		);
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new CallbackReporter(
+                static function (Issue $issue) use (&$reported, &$reported_message) {
+                    $reported         = true;
+                    $reported_message = $issue->message();
+                }
+            )
+        );
 
-		$issues = new InMemoryIssues();
-		$issues->add(
-			issue: Issue::from_exception(
-				exception: new Exception( 'Oops!' ),
-			),
-		);
+        $issues = new InMemoryIssues();
+        $issues->add(
+            issue: Issue::from_exception(
+                exception: new Exception('Oops!'),
+            ),
+        );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: $issues,
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: $issues,
+        );
 
-		$this->assertFalse( $reported );
-		$this->assertEmpty( $reported_message );
+        $this->assertFalse($reported);
+        $this->assertEmpty($reported_message);
 
-		$handler->publish();
+        $handler->publish();
 
-		$this->assertTrue( $reported );
-		$this->assertSame( 'Oops!', $reported_message );
-	}
+        $this->assertTrue($reported);
+        $this->assertSame('Oops!', $reported_message);
+    }
 
-	#[Test]
-	public function it_can_report_only_with_allowed_reporters(): void {
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new Dont( new AlwaysReport() ),
-			reporter: new CallbackReporter(
-				function ( Issue $issue ) {
-					echo 'Should Not Be Reported!';
-					echo $issue->message();
-				}
-			),
-		);
-		$reporters->add(
-			condition: new CallbackCondition(
-				function ( Issue $issue ) {
-					return $issue->exception() instanceof Exception;
-				}
-			),
-			reporter: new CallbackReporter(
-				function ( Issue $issue ) {
-					echo "This is a reported issue.\n";
-					echo $issue->message();
-				}
-			),
-		);
+    #[Test]
+    public function it_can_report_only_with_allowed_reporters(): void
+    {
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new Dont(new AlwaysReport()),
+            reporter: new CallbackReporter(
+                function (Issue $issue) {
+                    echo 'Should Not Be Reported!';
+                    echo $issue->message();
+                }
+            ),
+        );
+        $reporters->add(
+            condition: new CallbackCondition(
+                function (Issue $issue) {
+                    return $issue->exception() instanceof Exception;
+                }
+            ),
+            reporter: new CallbackReporter(
+                function (Issue $issue) {
+                    echo "This is a reported issue.\n";
+                    echo $issue->message();
+                }
+            ),
+        );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: new InMemoryIssues(),
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: new InMemoryIssues(),
+        );
 
-		$handler->capture( Issue::from_exception( new Exception( 'Oops!' ) ) );
+        $handler->capture(Issue::from_exception(new Exception('Oops!')));
 
-		ob_start();
-		$handler->publish();
-		$stdout = ob_get_clean();
+        ob_start();
+        $handler->publish();
+        $stdout = ob_get_clean();
 
-		$this->assertSame( "This is a reported issue.\nOops!", $stdout );
-	}
+        $this->assertSame("This is a reported issue.\nOops!", $stdout);
+    }
 
-	#[Test]
-	public function it_can_not_propagate_report_if_reporter_can_be_stopped(): void {
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new AlwaysStopAfter(
-				new CallbackReporter(
-					function ( Issue $issue ) {
-						echo "Only this is reported.\n";
-						echo $issue->message();
-					}
-				)
-			),
-		);
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new CallbackReporter(
-				function ( Issue $issue ) {
-					echo "This should not be reported.\n";
-					echo $issue->message();
-				}
-			),
-		);
+    #[Test]
+    public function it_can_not_propagate_report_if_reporter_can_be_stopped(): void
+    {
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new AlwaysStopAfter(
+                new CallbackReporter(
+                    function (Issue $issue) {
+                        echo "Only this is reported.\n";
+                        echo $issue->message();
+                    }
+                )
+            ),
+        );
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new CallbackReporter(
+                function (Issue $issue) {
+                    echo "This should not be reported.\n";
+                    echo $issue->message();
+                }
+            ),
+        );
 
-		$handler = new ReportHandler(
-			reporters: $reporters,
-			issues: new InMemoryIssues(),
-		);
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: new InMemoryIssues(),
+        );
 
-		$handler->capture( Issue::from_exception( new Exception( 'Oops!' ) ) );
+        $handler->capture(Issue::from_exception(new Exception('Oops!')));
 
-		ob_start();
-		$handler->publish();
-		$stdout = ob_get_clean();
+        ob_start();
+        $handler->publish();
+        $stdout = ob_get_clean();
 
-		$this->assertSame( "Only this is reported.\nOops!", $stdout );
-	}
+        $this->assertSame("Only this is reported.\nOops!", $stdout);
+    }
 }

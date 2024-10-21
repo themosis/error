@@ -21,40 +21,42 @@ use Themosis\Components\Error\Reporters\CallbackReporter;
 use Themosis\Components\Error\Reporters\Conditions\AlwaysReport;
 use Themosis\Components\Error\ReportHandler;
 
-final class ExceptionHandlerTest extends TestCase {
-	#[Test]
-	public function it_can_report_thrown_exception(): void {
-		$reporters = new InMemoryReporters();
-		$reporters->add(
-			condition: new AlwaysReport(),
-			reporter: new CallbackReporter(
-				static function ( Issue $issue ) {
-					$backtrace = new Backtrace( new InMemoryFrameIdentifiers() );
-					$backtrace->capture_exception( $issue->exception() );
+final class ExceptionHandlerTest extends TestCase
+{
+    #[Test]
+    public function it_can_report_thrown_exception(): void
+    {
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new CallbackReporter(
+                static function (Issue $issue) {
+                    $backtrace = new Backtrace(new InMemoryFrameIdentifiers());
+                    $backtrace->capture_exception($issue->exception());
 
-					( new ExceptionHandlerHttpResponse(
-						view_path: __DIR__ . '/../resources/views/exception.php',
-						backtrace: $backtrace,
-						information: new InMemoryInformation(),
-					) )->render( $issue );
-				}
-			),
-		);
+                    ( new ExceptionHandlerHttpResponse(
+                        view_path: __DIR__ . '/../resources/views/exception.php',
+                        backtrace: $backtrace,
+                        information: new InMemoryInformation(),
+                    ) )->render($issue);
+                }
+            ),
+        );
 
-		$report_handler = new ReportHandler(
-			reporters: $reporters,
-			issues: new InMemoryIssues(),
-		);
+        $report_handler = new ReportHandler(
+            reporters: $reporters,
+            issues: new InMemoryIssues(),
+        );
 
-		$report_handler->capture(
-			Issue::from_exception( new Exception( 'Oops' ) )
-		);
+        $report_handler->capture(
+            Issue::from_exception(new Exception('Oops'))
+        );
 
-		ob_start();
-			$report_handler->publish();
-		$stdout = ob_get_clean();
+        ob_start();
+            $report_handler->publish();
+        $stdout = ob_get_clean();
 
-		$this->assertTrue( str_contains( $stdout, 'Oops' ) );
-		$this->assertTrue( str_contains( $stdout, 'Issue' ) );
-	}
+        $this->assertTrue(str_contains($stdout, 'Oops'));
+        $this->assertTrue(str_contains($stdout, 'Issue'));
+    }
 }
