@@ -17,15 +17,15 @@ final class Issue
 {
     private function __construct(
         private Throwable $exception,
-        private IssueDate $occured_at,
+        private IssueDate $occuredAt,
     ) {
     }
 
-    public static function from_exception(Throwable $exception, ?DateTimeImmutable $occured_at = null): self
+    public static function fromException(Throwable $exception, ?DateTimeImmutable $occuredAt = null): self
     {
         return new self(
             exception: $exception,
-            occured_at: new IssueDate($occured_at ?? new DateTimeImmutable('now')),
+            occuredAt: new IssueDate($occuredAt ?? new DateTimeImmutable('now')),
         );
     }
 
@@ -36,9 +36,9 @@ final class Issue
 
     public function date(string $format = DateTimeImmutable::W3C): string
     {
-        return $this->occured_at
-            ->with_format($format)
-            ->as_string();
+        return $this->occuredAt
+            ->withFormat($format)
+            ->toString();
     }
 
     public function level(): Level
@@ -64,9 +64,9 @@ final class Issue
         return $this->exception;
     }
 
-    public function occured_at(): IssueDate
+    public function occuredAt(): IssueDate
     {
-        return $this->occured_at;
+        return $this->occuredAt;
     }
 
     public function preview(): FilePreview

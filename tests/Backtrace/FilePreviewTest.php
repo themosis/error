@@ -25,7 +25,7 @@ final class FilePreviewTest extends TestCase
             ),
         );
 
-        $this->assertCount(5, $preview->get_lines());
+        $this->assertCount(5, $preview->getLines());
     }
 
     #[Test]
@@ -40,6 +40,6 @@ final class FilePreviewTest extends TestCase
             ),
         );
 
-        $this->assertCount(7, $preview->get_lines());
+        $this->assertCount(7, $preview->getLines());
     }
 }

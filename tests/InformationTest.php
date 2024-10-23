@@ -27,14 +27,14 @@ final class InformationTest extends TestCase
             ->add(new TextInfo('Timezone', 'UTC'));
 
         $this->assertSame(10, $group->priority());
-        $this->assertCount(2, $group->get_information());
+        $this->assertCount(2, $group->getInformation());
 
-        $info = $group->get_information()[0];
+        $info = $group->getInformation()[0];
 
         $this->assertSame('PHP', $info->name());
         $this->assertSame('8.3.12', $info->value());
 
-        $info = $group->get_information()[1];
+        $info = $group->getInformation()[1];
 
         $this->assertSame('Timezone', $info->name());
         $this->assertSame('UTC', $info->value());
@@ -51,23 +51,23 @@ final class InformationTest extends TestCase
             ->add(new TextInfo('PHP', '8.1.13'))
             ->add(new TextInfo('ENV', 'local'));
 
-        $request_group = new InformationGroup(
+        $requestGroup = new InformationGroup(
             name: 'Request',
         );
 
-        $request_group
+        $requestGroup
             ->add(new TextInfo('Method', 'GET'))
             ->add(new TextInfo('Path', '/'))
             ->add(new TextInfo('Query', 'search=something'));
 
         $information = new InMemoryInformation();
         $information->add($group);
-        $information->add($request_group);
+        $information->add($requestGroup);
 
-        $result = $information->get_information_by_priority();
+        $result = $information->getInformationByPriority();
 
         $this->assertSame($group->name(), $result[0]->name());
-        $this->assertSame($request_group->name(), $result[1]->name());
+        $this->assertSame($requestGroup->name(), $result[1]->name());
     }
 
     #[Test]
@@ -81,39 +81,39 @@ final class InformationTest extends TestCase
             ->add(new TextInfo('PHP', '8.1.13'))
             ->add(new TextInfo('ENV', 'local'));
 
-        $request_group = new InformationGroup(
+        $requestGroup = new InformationGroup(
             name: 'Request',
             priority: 5,
         );
 
-        $request_group
+        $requestGroup
             ->add(new TextInfo('Method', 'GET'))
             ->add(new TextInfo('Path', '/'))
             ->add(new TextInfo('Query', 'search=something'));
 
-        $git_group = new InformationGroup(
+        $gitGroup = new InformationGroup(
             name: 'Git',
             priority: 15,
         );
 
-        $git_group
+        $gitGroup
             ->add(new TextInfo('Branch', 'main'))
             ->add(new TextInfo('User', 'You'));
 
         $information = new InMemoryInformation();
         $information->add($group);
-        $information->add($request_group);
-        $information->add($git_group);
+        $information->add($requestGroup);
+        $information->add($gitGroup);
 
-        $result = $information->get_information_by_priority();
+        $result = $information->getInformationByPriority();
 
-        $this->assertSame($request_group->name(), $result[0]->name());
-        $this->assertSame($request_group->priority(), $result[0]->priority());
+        $this->assertSame($requestGroup->name(), $result[0]->name());
+        $this->assertSame($requestGroup->priority(), $result[0]->priority());
 
         $this->assertSame($group->name(), $result[1]->name());
         $this->assertSame($group->priority(), $result[1]->priority());
 
-        $this->assertSame($git_group->name(), $result[2]->name());
-        $this->assertSame($git_group->priority(), $result[2]->priority());
+        $this->assertSame($gitGroup->name(), $result[2]->name());
+        $this->assertSame($gitGroup->priority(), $result[2]->priority());
     }
 }

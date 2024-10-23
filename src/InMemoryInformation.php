@@ -27,7 +27,7 @@ final class InMemoryInformation implements Information
     /**
      * @return array<int,InformationGroup>
      */
-    public function get_information_by_priority(): array
+    public function getInformationByPriority(): array
     {
         $information = $this->information;
 

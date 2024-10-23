@@ -19,14 +19,14 @@ final class IssueDate
     ) {
     }
 
-    public function with_format(string $format): static
+    public function withFormat(string $format): static
     {
         $this->format = $format;
 
         return $this;
     }
 
-    public function as_string(): string
+    public function toString(): string
     {
         return $this->datetime->format($this->format);
     }

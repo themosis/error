@@ -13,14 +13,14 @@ use Throwable;
 final class ExceptionHandler
 {
     public function __construct(
-        private ReportHandler $report_handler,
+        private ReportHandler $reportHandler,
     ) {
     }
 
     public function __invoke(Throwable $exception)
     {
-        $this->report_handler
-            ->capture(Issue::from_exception($exception))
+        $this->reportHandler
+            ->capture(Issue::fromException($exception))
             ->publish();
     }
 }

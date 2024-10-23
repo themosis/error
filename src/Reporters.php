@@ -12,5 +12,5 @@ interface Reporters
 {
     public function add(ReportCondition $condition, Reporter $reporter): void;
 
-    public function get_allowed_reporters(Issue $issue): array;
+    public function getAllowedReporters(Issue $issue): array;
 }

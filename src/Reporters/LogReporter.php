@@ -26,7 +26,7 @@ final class LogReporter implements Reporter
             level: $issue->level()->value,
             message: $issue->message(),
             context: array_reduce(
-                $issue->info()?->get_information() ?? [],
+                $issue->info()?->getInformation() ?? [],
                 static function (array $carry, Info $info) {
                     $carry[ $info->name() ] = $info->value();
                 },

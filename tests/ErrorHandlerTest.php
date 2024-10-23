@@ -30,14 +30,14 @@ final class ErrorHandlerTest extends TestCase
     {
         $reporters = new InMemoryReporters();
 
-        $error_handler = new ErrorHandler(
-            report_handler: new ReportHandler(
+        $errorHandler = new ErrorHandler(
+            reportHandler: new ReportHandler(
                 reporters: $reporters,
                 issues: new InMemoryIssues(),
             ),
         );
 
-        set_error_handler($error_handler);
+        set_error_handler($errorHandler);
 
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('User Error');
@@ -50,14 +50,14 @@ final class ErrorHandlerTest extends TestCase
     {
         $reporters = new InMemoryReporters();
 
-        $error_handler = new ErrorHandler(
-            report_handler: new ReportHandler(
+        $errorHandler = new ErrorHandler(
+            reportHandler: new ReportHandler(
                 reporters: $reporters,
                 issues: new InMemoryIssues(),
             ),
         );
 
-        set_error_handler($error_handler);
+        set_error_handler($errorHandler);
 
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('User Notice');
@@ -70,14 +70,14 @@ final class ErrorHandlerTest extends TestCase
     {
         $reporters = new InMemoryReporters();
 
-        $error_handler = new ErrorHandler(
-            report_handler: new ReportHandler(
+        $errorHandler = new ErrorHandler(
+            reportHandler: new ReportHandler(
                 reporters: $reporters,
                 issues: new InMemoryIssues(),
             ),
         );
 
-        set_error_handler($error_handler);
+        set_error_handler($errorHandler);
 
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('User Warning');
@@ -88,7 +88,7 @@ final class ErrorHandlerTest extends TestCase
     #[Test]
     public function it_can_report_deprecated_errors(): void
     {
-        $fake_log_message = '';
+        $fakeLogMessage = '';
 
         $reporters = new InMemoryReporters();
         $reporters->add(
@@ -102,22 +102,22 @@ final class ErrorHandlerTest extends TestCase
         $reporters->add(
             condition: new AlwaysReport(),
             reporter: new CallbackReporter(
-                function (Issue $issue) use (&$fake_log_message) {
-                    $fake_log_message = $issue->message();
+                function (Issue $issue) use (&$fakeLogMessage) {
+                    $fakeLogMessage = $issue->message();
                 }
             ),
         );
 
-        $error_handler = new ErrorHandler(
-            report_handler: new ReportHandler(
+        $errorHandler = new ErrorHandler(
+            reportHandler: new ReportHandler(
                 reporters: $reporters,
                 issues: new InMemoryIssues(),
             ),
         );
 
-        set_error_handler($error_handler);
+        set_error_handler($errorHandler);
 
-        $this->assertEmpty($fake_log_message);
+        $this->assertEmpty($fakeLogMessage);
 
         ob_start();
 
@@ -126,6 +126,6 @@ final class ErrorHandlerTest extends TestCase
         $stdout = ob_get_clean();
 
         $this->assertSame('User Deprecated Error', $stdout);
-        $this->assertSame('User Deprecated Error', $fake_log_message);
+        $this->assertSame('User Deprecated Error', $fakeLogMessage);
     }
 }

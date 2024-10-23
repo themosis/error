@@ -21,7 +21,7 @@ final class FrameTest extends TestCase
     #[Test]
     public function it_can_generate_a_backtrace_frame_for_class_with_static_method(): void
     {
-        $data = FramesProvider::class_with_static_method();
+        $data = FramesProvider::classWithStaticMethod();
 
         $frame = new Frame($data);
 
@@ -38,7 +38,7 @@ final class FrameTest extends TestCase
     #[Test]
     public function it_can_generate_a_backtrace_frame_for_class_with_instance_method(): void
     {
-        $data = FramesProvider::class_with_instance_method();
+        $data = FramesProvider::classWithInstanceMethod();
 
         $frame = new Frame($data);
 
@@ -55,7 +55,7 @@ final class FrameTest extends TestCase
     #[Test]
     public function it_can_generate_a_backtrace_frame_for_file_with_include(): void
     {
-        $data = FramesProvider::file_with_include();
+        $data = FramesProvider::fileWithInclude();
 
         $frame = new Frame($data);
 
@@ -68,25 +68,25 @@ final class FrameTest extends TestCase
     #[Test]
     public function it_can_create_a_backtrace_frame_and_assign_one_or_multiple_tags(): void
     {
-        $data = FramesProvider::class_with_instance_method();
+        $data = FramesProvider::classWithInstanceMethod();
 
         $frame = new Frame($data);
 
-        $frame->add_tag(
+        $frame->addTag(
             new CustomFrameTag(
                 slug: 'vendor',
                 name: 'PHP Vendor',
             )
         );
 
-        $frame->add_tag(
+        $frame->addTag(
             new CustomFrameTag(
                 slug: 'themosis',
                 name: 'Themosis Component',
             )
         );
 
-        $frame->add_tag(
+        $frame->addTag(
             new CustomFrameTag(
                 slug: 'test',
                 name: 'Unit Test',
@@ -99,7 +99,7 @@ final class FrameTest extends TestCase
     #[Test]
     public function it_can_not_have_duplicate_tags_if_using_same_slugs(): void
     {
-        $data = FramesProvider::class_with_instance_method();
+        $data = FramesProvider::classWithInstanceMethod();
 
         $frame = new Frame($data);
 
@@ -108,14 +108,14 @@ final class FrameTest extends TestCase
             name: 'Vendor',
         );
 
-        $frame->add_tag($first_tag);
+        $frame->addTag($first_tag);
 
         $last_tag = new CustomFrameTag(
             slug: 'vendor',
             name: 'Third-Party Package',
         );
 
-        $frame->add_tag($last_tag);
+        $frame->addTag($last_tag);
 
         $this->assertCount(1, $frame->tags());
         $this->assertSame(
@@ -127,35 +127,35 @@ final class FrameTest extends TestCase
     #[Test]
     public function it_can_identify_a_frame_using_tag(): void
     {
-        $data = FramesProvider::class_with_static_method();
+        $data = FramesProvider::classWithStaticMethod();
 
         $frame = new Frame($data);
 
-        $app_tag = new AppFrameTag();
+        $appTag = new AppFrameTag();
 
-        $frame->add_tag($app_tag);
+        $frame->addTag($appTag);
 
-        $package_tag = new VendorFrameTag();
+        $packageTag = new VendorFrameTag();
 
-        $frame->add_tag($package_tag);
+        $frame->addTag($packageTag);
 
-        $this->assertTrue($frame->is($app_tag));
+        $this->assertTrue($frame->is($appTag));
         $this->assertTrue($frame->is(new CustomFrameTag(slug: 'app', name: 'Application')));
         $this->assertFalse($frame->is(new CustomFrameTag(slug: 'app', name: 'App')));
 
-        $this->assertTrue($frame->is($package_tag));
+        $this->assertTrue($frame->is($packageTag));
         $this->assertFalse($frame->is(new CustomFrameTag(slug: 'vendor', name: 'Package')));
     }
 
     #[Test]
     public function it_can_identify_a_vendor_frame(): void
     {
-        $data = FramesProvider::vendor_class_with_instance_method();
+        $data = FramesProvider::vendorClassWithInstanceMethod();
 
         $frame = new Frame($data);
 
         $identifier = new VendorFrameIdentifier(
-            project_root_path: '/disk/web/project',
+            projectRootPath: '/disk/web/project',
         );
 
         $this->assertTrue($identifier->identify($frame));

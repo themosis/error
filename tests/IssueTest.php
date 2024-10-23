@@ -18,13 +18,13 @@ final class IssueTest extends TestCase
     {
         $exception = new FakeException('Something went wrong with the order.');
 
-        $issue = Issue::from_exception($exception);
+        $issue = Issue::fromException($exception);
 
         $information = $issue->info();
 
         $this->assertNotNull($information);
 
-        $infos = $information->get_information();
+        $infos = $information->getInformation();
 
         $this->assertCount(2, $infos);
 

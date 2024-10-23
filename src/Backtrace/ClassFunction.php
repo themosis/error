@@ -17,7 +17,7 @@ final class ClassFunction implements FrameClassFunction
     ) {
     }
 
-    public function get_class(): string
+    public function getClass(): string
     {
         return $this->className;
     }

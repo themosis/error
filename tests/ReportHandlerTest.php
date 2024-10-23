@@ -32,8 +32,8 @@ final class ReportHandlerTest extends TestCase
     #[Test]
     public function it_can_report_an_issue_on_single_registered_reporter(): void
     {
-        $frame_identifiers = new InMemoryFrameIdentifiers();
-        $backtrace         = new Backtrace($frame_identifiers);
+        $frameIdentifiers = new InMemoryFrameIdentifiers();
+        $backtrace = new Backtrace($frameIdentifiers);
 
         $reporters = new InMemoryReporters();
         $reporters->add(
@@ -41,9 +41,9 @@ final class ReportHandlerTest extends TestCase
             reporter: new StdoutReporter($backtrace)
         );
 
-        $issue                    = Issue::from_exception(
+        $issue = Issue::fromException(
             exception: $exception = new Exception('There was an error...'),
-            occured_at: $date     = new DateTimeImmutable('now'),
+            occuredAt: $date = new DateTimeImmutable('now'),
         );
 
         $issues = new InMemoryIssues();
@@ -71,8 +71,8 @@ final class ReportHandlerTest extends TestCase
     #[Test]
     public function it_can_report_an_issue_on_multiple_registered_reporters(): void
     {
-        $frame_identifiers = new InMemoryFrameIdentifiers();
-        $backtrace         = new Backtrace($frame_identifiers);
+        $frameIdentifiers = new InMemoryFrameIdentifiers();
+        $backtrace = new Backtrace($frameIdentifiers);
 
         $reporters = new InMemoryReporters();
         $reporters->add(
@@ -88,11 +88,11 @@ final class ReportHandlerTest extends TestCase
             reporter: new StdoutReporter($backtrace)
         );
 
-        $issues                       = new InMemoryIssues();
+        $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::from_exception(
+            issue: Issue::fromException(
                 exception: $exception = new Exception('There was an error...'),
-                occured_at: $date     = new DateTimeImmutable('now'),
+                occuredAt: $date = new DateTimeImmutable('now'),
             ),
         );
 
@@ -129,9 +129,9 @@ final class ReportHandlerTest extends TestCase
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::from_exception(
+            issue: Issue::fromException(
                 exception: new Exception('Something went wrong!'),
-                occured_at: new DateTimeImmutable('now'),
+                occuredAt: new DateTimeImmutable('now'),
             ),
         );
 
@@ -151,8 +151,8 @@ final class ReportHandlerTest extends TestCase
     #[Test]
     public function it_can_report_multiple_issues_on_single_reporter(): void
     {
-        $frame_identifiers = new InMemoryFrameIdentifiers();
-        $backtrace         = new Backtrace($frame_identifiers);
+        $frameIdentifiers = new InMemoryFrameIdentifiers();
+        $backtrace = new Backtrace($frameIdentifiers);
 
         $reporters = new InMemoryReporters();
         $reporters->add(
@@ -160,17 +160,17 @@ final class ReportHandlerTest extends TestCase
             reporter: new StdoutReporter($backtrace)
         );
 
-        $issues                         = new InMemoryIssues();
+        $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::from_exception(
+            issue: Issue::fromException(
                 exception: $exception_a = new Exception('Error AAA'),
-                occured_at: $date_a     = new DateTimeImmutable('2 days ago'),
+                occuredAt: $date_a = new DateTimeImmutable('2 days ago'),
             ),
         );
         $issues->add(
-            issue: Issue::from_exception(
+            issue: Issue::fromException(
                 exception: $exception_b = new Exception('Error BBB'),
-                occured_at: $date_b     = new DateTimeImmutable('now'),
+                occuredAt: $date_b = new DateTimeImmutable('now'),
             ),
         );
 
@@ -183,28 +183,28 @@ final class ReportHandlerTest extends TestCase
         $handler->publish();
         $stdout = ob_get_clean();
 
-        $expected_a = sprintf(
+        $expectedA = sprintf(
             "[%s] %s\n%s\n",
             $date_a->format(DateTimeImmutable::W3C),
             $exception_a->getMessage(),
             (string) $backtrace
         );
 
-        $expected_b = sprintf(
+        $expectedB = sprintf(
             "[%s] %s\n%s\n",
             $date_b->format(DateTimeImmutable::W3C),
             $exception_b->getMessage(),
             (string) $backtrace
         );
 
-        $this->assertSame(implode('', [ $expected_a, $expected_b ]), $stdout);
+        $this->assertSame(implode('', [ $expectedA, $expectedB ]), $stdout);
     }
 
     #[Test]
     public function it_can_report_multiple_issues_on_multiple_reporters(): void
     {
-        $frame_identifiers = new InMemoryFrameIdentifiers();
-        $backtrace         = new Backtrace($frame_identifiers);
+        $frameIdentifiers = new InMemoryFrameIdentifiers();
+        $backtrace = new Backtrace($frameIdentifiers);
 
         $logger = new Logger('TEST');
         $logger->pushHandler(new StreamHandler('php://output'));
@@ -221,15 +221,15 @@ final class ReportHandlerTest extends TestCase
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::from_exception(
+            issue: Issue::fromException(
                 exception: new Exception('Error AAA'),
-                occured_at: new DateTimeImmutable('2 days ago'),
+                occuredAt: new DateTimeImmutable('2 days ago'),
             ),
         );
         $issues->add(
-            issue: Issue::from_exception(
+            issue: Issue::fromException(
                 exception: new Exception('Error BBB'),
-                occured_at: new DateTimeImmutable('now'),
+                occuredAt: new DateTimeImmutable('now'),
             ),
         );
 
@@ -242,33 +242,33 @@ final class ReportHandlerTest extends TestCase
         $handler->publish();
         $stdout = ob_get_clean();
 
-        preg_match_all('/Error AAA/', $stdout, $matches_a);
-        preg_match_all('/Error BBB/', $stdout, $matches_b);
+        preg_match_all('/Error AAA/', $stdout, $matchesA);
+        preg_match_all('/Error BBB/', $stdout, $matchesB);
 
-        $this->assertCount(2, array_shift($matches_a));
-        $this->assertCount(2, array_shift($matches_b));
+        $this->assertCount(2, array_shift($matchesA));
+        $this->assertCount(2, array_shift($matchesB));
     }
 
     #[Test]
     public function it_can_report_an_issue_using_a_closure(): void
     {
-        $reported         = false;
-        $reported_message = '';
+        $reported = false;
+        $reportedMessage = '';
 
         $reporters = new InMemoryReporters();
         $reporters->add(
             condition: new AlwaysReport(),
             reporter: new CallbackReporter(
-                static function (Issue $issue) use (&$reported, &$reported_message) {
-                    $reported         = true;
-                    $reported_message = $issue->message();
+                static function (Issue $issue) use (&$reported, &$reportedMessage) {
+                    $reported = true;
+                    $reportedMessage = $issue->message();
                 }
             )
         );
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::from_exception(
+            issue: Issue::fromException(
                 exception: new Exception('Oops!'),
             ),
         );
@@ -279,12 +279,12 @@ final class ReportHandlerTest extends TestCase
         );
 
         $this->assertFalse($reported);
-        $this->assertEmpty($reported_message);
+        $this->assertEmpty($reportedMessage);
 
         $handler->publish();
 
         $this->assertTrue($reported);
-        $this->assertSame('Oops!', $reported_message);
+        $this->assertSame('Oops!', $reportedMessage);
     }
 
     #[Test]
@@ -319,7 +319,7 @@ final class ReportHandlerTest extends TestCase
             issues: new InMemoryIssues(),
         );
 
-        $handler->capture(Issue::from_exception(new Exception('Oops!')));
+        $handler->capture(Issue::fromException(new Exception('Oops!')));
 
         ob_start();
         $handler->publish();
@@ -358,7 +358,7 @@ final class ReportHandlerTest extends TestCase
             issues: new InMemoryIssues(),
         );
 
-        $handler->capture(Issue::from_exception(new Exception('Oops!')));
+        $handler->capture(Issue::fromException(new Exception('Oops!')));
 
         ob_start();
         $handler->publish();

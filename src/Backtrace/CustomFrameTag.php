@@ -18,7 +18,10 @@ final class CustomFrameTag extends AbstractFrameTag
     ) {
         if ($this->slugHasInvalidFormat($this->slug)) {
             throw new InvalidFrameTagArgument(
-                message: sprintf('Frame tag slug "%s" is not valid. Use only lowercase letters and underscores.', $this->slug),
+                message: sprintf(
+                    'Frame tag slug "%s" is not valid. Use only lowercase letters and underscores.',
+                    $this->slug
+                ),
             );
         }
 

@@ -13,7 +13,7 @@ use ErrorException;
 final class ErrorHandler
 {
     public function __construct(
-        private ReportHandler $report_handler,
+        private ReportHandler $reportHandler,
     ) {
     }
 
@@ -21,9 +21,9 @@ final class ErrorHandler
     {
         $error = new ErrorException($errstr, 0, $errno, $errfile, $errline);
 
-        if ($this->is_deprecation($errno)) {
-            $this->report_handler
-                ->capture(Issue::from_exception($error))
+        if ($this->isDeprecation($errno)) {
+            $this->reportHandler
+                ->capture(Issue::fromException($error))
                 ->publish();
 
             return true;
@@ -34,7 +34,7 @@ final class ErrorHandler
         return false;
     }
 
-    private function is_deprecation(int $level): bool
+    private function isDeprecation(int $level): bool
     {
         return in_array($level, [ E_DEPRECATED, E_USER_DEPRECATED ], true);
     }

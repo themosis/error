@@ -495,7 +495,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
 </head>
 <body>
     <div id="page">
-        <!-- Sidebar -->
         <aside id="sidebar">
             <nav>
                 <ul class="nav">
@@ -509,8 +508,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 </ul>
             </nav>
         </aside>
-        <!-- End Sidebar -->
-        <!-- Main -->
         <main id="main">
             <div class="wrapper">
                 <section id="issue" class="section">
@@ -519,15 +516,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
                         <p class="message"><?= $message ?></p>
                         <p class="file"><?= $file ?></p>
                         <?= $preview(
-                        $render_preview = fn (string $lines) => <<<PREVIEW
+                        $renderPreview = fn (string $lines) => <<<PREVIEW
                             <div class="preview">
                                 <pre>
                                     <code>{$lines}</code>
                                 </pre>
                             </div>
                         PREVIEW,
-                        $render_preview_line = fn (string $class_name, int $length, int $number, string $line) => <<<LINE
-                            <span class="line {$class_name}"><span class="line-number" style="min-width: calc(10px * {$length});">{$number}</span><span class="line-content">{$line}</span></span>
+                        $renderPreviewLine = fn (string $className, int $length, int $number, string $line) => <<<LINE
+                            <span class="line {$className}"><span class="line-number" style="min-width: calc(10px * {$length});">{$number}</span><span class="line-content">{$line}</span></span>
                         LINE); ?>
                     </div>
                     <?= $frames(
@@ -549,8 +546,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
                         fn(string $tagname) => <<<TAG
                             <span class="frame-identifier">{$tagname}</span>
                         TAG,
-                        $render_preview,
-                        $render_preview_line
+                        $renderPreview,
+                        $renderPreviewLine
                     ); ?>
                 </section>
                 <?= $information(
@@ -572,7 +569,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 ); ?>
             </div>
         </main>
-        <!-- End Main -->
     </div>
 </body>
 </html>

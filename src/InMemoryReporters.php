@@ -31,7 +31,7 @@ final class InMemoryReporters implements Reporters
     /**
      * @return array<int, Reporter>
      */
-    public function get_allowed_reporters(Issue $issue): array
+    public function getAllowedReporters(Issue $issue): array
     {
         return array_reduce(
             $this->reporters,

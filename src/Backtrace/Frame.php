@@ -49,7 +49,7 @@ final class Frame implements Stringable, IteratorAggregate
         $this->args = $frame['args'] ?? [];
     }
 
-    public function add_tag(FrameTag ...$tags): void
+    public function addTag(FrameTag ...$tags): void
     {
         foreach ($tags as $tag) {
             $this->tags[ $tag->slug() ] = $tag;

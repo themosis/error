@@ -63,7 +63,11 @@ final class Backtrace implements Stringable
             frameIdentifiers: $this->frameIdentifiers,
         );
 
-        $filteredFrames = array_map(fn(Frame $frame) => $frame->as_array(), array_filter($this->frames, $filterCallback));
+        $filteredFrames = array_map(
+            fn(Frame $frame) => $frame->toArray(),
+            array_filter($this->frames, $filterCallback)
+        );
+
         $filteredBacktrace->capture($filteredFrames);
 
         return $filteredBacktrace;
@@ -80,7 +84,10 @@ final class Backtrace implements Stringable
             }
         );
 
-        $frame->add_tag(...array_map(fn(FrameIdentifier $frameIdentifier) => $frameIdentifier->tag(), $applicableIdentifiers));
+        $frame->addTag(...array_map(
+            fn(FrameIdentifier $frameIdentifier) => $frameIdentifier->tag(),
+            $applicableIdentifiers
+        ));
 
         return $frame;
     }

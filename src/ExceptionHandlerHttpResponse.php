@@ -18,7 +18,7 @@ use Themosis\Components\Error\Backtrace\FrameTag;
 final class ExceptionHandlerHttpResponse
 {
     public function __construct(
-        private string $view_path,
+        private string $viewPath,
         private Backtrace $backtrace,
         private Information $information,
     ) {
@@ -36,66 +36,82 @@ final class ExceptionHandlerHttpResponse
         $exception = $issue->exception();
 
         $content(
-            $this->view_path,
+            $this->viewPath,
             [
-                'title'           => $issue->message(),
-                'message'         => $issue->message(),
-                'exception_class' => get_class($exception),
-                'file'            => sprintf('%s:%s', $exception->getFile(), $exception->getLine()),
-                'preview'         => fn (Closure $preview_callback, Closure $line_callback) => $this->render_preview($issue->preview(), $preview_callback, $line_callback),
-                'frames'          => function (Closure $frames_callback, Closure $frame_callback, Closure $tag_callback, Closure $preview_callback, Closure $line_callback) {
+                'title' => $issue->message(),
+                'message' => $issue->message(),
+                'exceptionClass' => get_class($exception),
+                'file' => sprintf('%s:%s', $exception->getFile(), $exception->getLine()),
+                'preview' => function (Closure $previewCallback, Closure $lineCallback) use ($issue) {
+                    return $this->renderPreview($issue->preview(), $previewCallback, $lineCallback);
+                },
+                'frames' => function (
+                    Closure $framesCallback,
+                    Closure $frameCallback,
+                    Closure $tagCallback,
+                    Closure $previewCallback,
+                    Closure $lineCallback,
+                ) {
                     if (empty($this->backtrace->frames())) {
                         return;
                     }
 
                     $frames = array_map(
-                        fn (Frame $frame) => $frame_callback(
-                            function: htmlentities((string) $frame->get_function()),
-                            file: htmlentities((string) $frame->get_file()),
-                            tags: $this->render_tags($frame, $tag_callback),
-                            preview: $this->render_preview(new FilePreview($frame->get_file()), $preview_callback, $line_callback)
+                        fn (Frame $frame) => $frameCallback(
+                            function: htmlentities((string) $frame->getFunction()),
+                            file: htmlentities((string) $frame->getFile()),
+                            tags: $this->renderTags($frame, $tagCallback),
+                            preview: $this->renderPreview(
+                                new FilePreview($frame->getFile()),
+                                $previewCallback,
+                                $lineCallback
+                            ),
                         ),
                         $this->backtrace->frames()
                     );
 
-                    return $frames_callback(implode(PHP_EOL, $frames));
+                    return $framesCallback(implode(PHP_EOL, $frames));
                 },
-                'information'     => function (Closure $information_callback, Closure $infogroup_callback, Closure $info_callback) {
+                'information' => function (
+                    Closure $informationCallback,
+                    Closure $infogroupCallback,
+                    Closure $infoCallback
+                ) {
                     $information = array_map(
-                        static function (InformationGroup $group) use ($infogroup_callback, $info_callback) {
+                        static function (InformationGroup $group) use ($infogroupCallback, $infoCallback) {
                             $infos = array_map(
-                                static function (Info $info) use ($info_callback) {
-                                    return $info_callback(
+                                static function (Info $info) use ($infoCallback) {
+                                    return $infoCallback(
                                         label: $info->name(),
                                         value: $info->value(),
                                     );
                                 },
-                                $group->get_information()
+                                $group->getInformation()
                             );
 
-                            return $infogroup_callback(
+                            return $infogroupCallback(
                                 slug: $group->slug(),
                                 title: $group->title(),
                                 infos: implode(PHP_EOL, $infos),
                             );
                         },
-                        $this->information->get_information_by_priority(),
+                        $this->information->getInformationByPriority(),
                     );
 
-                    return $information_callback(implode(PHP_EOL, $information));
+                    return $informationCallback(implode(PHP_EOL, $information));
                 },
-                'navigation'      => function (Closure $navigation_callback) {
+                'navigation' => function (Closure $navigationCallback) {
                     $items = array_reduce(
-                        $this->information->get_information_by_priority(),
-                        static function (array $carry, InformationGroup $item) use ($navigation_callback) {
-                            $carry[] = $navigation_callback(
+                        $this->information->getInformationByPriority(),
+                        static function (array $carry, InformationGroup $item) use ($navigationCallback) {
+                            $carry[] = $navigationCallback(
                                 id: $item->slug(),
                                 title: $item->title(),
                             );
 
                             return $carry;
                         },
-                        [ $navigation_callback(id: 'issue', title: 'Issue') ]
+                        [ $navigationCallback(id: 'issue', title: 'Issue') ]
                     );
 
                     return implode(PHP_EOL, $items);
@@ -104,25 +120,25 @@ final class ExceptionHandlerHttpResponse
         );
     }
 
-    private function render_tags(Frame $frame, callable $tag_callback): string
+    private function renderTags(Frame $frame, callable $tagCallback): string
     {
-        $tags = array_map(static fn (FrameTag $tag) => $tag_callback(htmlentities($tag->name())), $frame->tags());
+        $tags = array_map(static fn (FrameTag $tag) => $tagCallback(htmlentities($tag->name())), $frame->tags());
 
         return implode(PHP_EOL, $tags);
     }
 
-    private function render_preview(FilePreview $file, callable $preview_callback, callable $line_callback): string
+    private function renderPreview(FilePreview $file, callable $previewCallback, callable $lineCallback): string
     {
         $lines = array_map(
-            static fn (FilePreviewLine $line) => $line_callback(
-                class_name: $file->is_current_line($line->number()) ? 'current-line' : '',
-                length: $file->row_number_length(),
+            static fn (FilePreviewLine $line) => $lineCallback(
+                className: $file->isCurrentLine($line->number()) ? 'current-line' : '',
+                length: $file->rowNumberLength(),
                 number: $line->number(),
                 line: $line->content(),
             ),
-            $file->get_lines(),
+            $file->getLines(),
         );
 
-        return $preview_callback(implode(PHP_EOL, $lines));
+        return $previewCallback(implode(PHP_EOL, $lines));
     }
 }

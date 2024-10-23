@@ -51,7 +51,7 @@ final class InformationGroup
     /**
      * @return array<int,Info>
      */
-    public function get_information(): array
+    public function getInformation(): array
     {
         return $this->information;
     }

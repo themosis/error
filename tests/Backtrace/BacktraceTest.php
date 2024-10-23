@@ -27,14 +27,14 @@ final class BacktraceTest extends TestCase
         $identifiers = new InMemoryFrameIdentifiers();
 
         $backtrace = new Backtrace(
-            frame_identifiers: $identifiers,
+            frameIdentifiers: $identifiers,
         );
 
-        $raw_backtrace = debug_backtrace();
+        $rawBacktrace = debug_backtrace();
 
-        $backtrace->capture($raw_backtrace);
+        $backtrace->capture($rawBacktrace);
 
-        $this->assertSame(count($raw_backtrace), count($backtrace->frames()));
+        $this->assertSame(count($rawBacktrace), count($backtrace->frames()));
 
         foreach ($backtrace->frames() as $frame) {
             $this->assertTrue(is_a($frame, Frame::class));
@@ -47,25 +47,25 @@ final class BacktraceTest extends TestCase
         $identifiers = new InMemoryFrameIdentifiers();
 
         $backtrace = new Backtrace(
-            frame_identifiers: $identifiers,
+            frameIdentifiers: $identifiers,
         );
 
         $backtrace->capture(debug_backtrace());
 
-        $filtered_backtrace = $backtrace->filter(
+        $filteredBacktrace = $backtrace->filter(
             function (Frame $frame) {
-                $frame_function = $frame->get_function();
+                $frameFunction = $frame->getFunction();
 
-                if ($frame_function instanceof FrameClassFunction) {
-                    return self::class === $frame_function->get_class();
+                if ($frameFunction instanceof FrameClassFunction) {
+                    return self::class === $frameFunction->getClass();
                 }
 
                 return false;
             }
         );
 
-        $this->assertNotSame($backtrace, $filtered_backtrace);
-        $this->assertCount(1, $filtered_backtrace->frames());
+        $this->assertNotSame($backtrace, $filteredBacktrace);
+        $this->assertCount(1, $filteredBacktrace->frames());
     }
 
     #[Test]
@@ -75,23 +75,23 @@ final class BacktraceTest extends TestCase
 
         $identifiers->add(
             identifier: new VendorFrameIdentifier(
-                project_root_path: dirname(__DIR__, 2),
+                projectRootPath: dirname(__DIR__, 2),
             ),
         );
 
-        $test_file_tag = new CustomFrameTag(
+        $testFileTag = new CustomFrameTag(
             slug: 'test',
             name: 'Component Test File',
         );
 
         $identifiers->add(
             identifier: new CustomFrameIdentifier(
-                tag: $test_file_tag,
+                tag: $testFileTag,
                 identifier: function (Frame $frame) {
-                    $frame_function = $frame->get_function();
+                    $frameFunction = $frame->getFunction();
 
-                    if ($frame_function instanceof FrameClassFunction) {
-                        return self::class === $frame_function->get_class();
+                    if ($frameFunction instanceof FrameClassFunction) {
+                        return self::class === $frameFunction->getClass();
                     }
 
                     return false;
@@ -100,7 +100,7 @@ final class BacktraceTest extends TestCase
         );
 
         $backtrace = ( new Backtrace(
-            frame_identifiers: $identifiers,
+            frameIdentifiers: $identifiers,
         ) )->capture(debug_backtrace());
 
         $frames = $backtrace->frames();
@@ -110,7 +110,7 @@ final class BacktraceTest extends TestCase
 
         $this->assertCount(2, $first_frame->tags());
         $this->assertTrue($first_frame->is(new VendorFrameTag()));
-        $this->assertTrue($first_frame->is($test_file_tag));
+        $this->assertTrue($first_frame->is($testFileTag));
 
         /** @var Frame $second_frame */
         $second_frame = $frames[1];
@@ -125,7 +125,7 @@ final class BacktraceTest extends TestCase
         $identifiers = new InMemoryFrameIdentifiers();
 
         $backtrace = new Backtrace(
-            frame_identifiers: $identifiers,
+            frameIdentifiers: $identifiers,
         );
 
         $backtrace->capture(debug_backtrace());
@@ -136,27 +136,27 @@ final class BacktraceTest extends TestCase
 
         $output = ob_get_clean();
 
-        $first_frame = $backtrace->frames()[0];
+        $firstFrame = $backtrace->frames()[0];
 
-        $this->assertStringContainsString((string) $first_frame, $output);
+        $this->assertStringContainsString((string) $firstFrame, $output);
     }
 
     #[Test]
     public function it_can_generate_a_debug_backtrace_using_debug_named_constructor(): void
     {
         $backtrace = new Backtrace(
-            frame_identifiers: new InMemoryFrameIdentifiers(),
+            frameIdentifiers: new InMemoryFrameIdentifiers(),
         );
 
         $backtrace->capture(debug_backtrace());
 
-        $first_frame_backtrace = $backtrace->frames()[0];
+        $firstFrameBacktrace = $backtrace->frames()[0];
 
-        $debug_backtrace = Backtrace::debug();
+        $debugBacktrace = Backtrace::debug();
 
-        $first_frame_debug_backtrace = $debug_backtrace->frames()[0];
+        $firstFrameDebugBacktrace = $debugBacktrace->frames()[0];
 
-        $this->assertSame((string) $first_frame_backtrace, (string) $first_frame_debug_backtrace);
-        $this->assertSame((string) $backtrace, (string) $debug_backtrace);
+        $this->assertSame((string) $firstFrameBacktrace, (string) $firstFrameDebugBacktrace);
+        $this->assertSame((string) $backtrace, (string) $debugBacktrace);
     }
 }

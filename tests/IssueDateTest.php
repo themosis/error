@@ -26,7 +26,7 @@ final class IssueDateTest extends TestCase
             ),
         );
 
-        $this->assertSame('2024-07-10T13:42:18+02:00', $date->as_string());
+        $this->assertSame('2024-07-10T13:42:18+02:00', $date->toString());
     }
 
     #[Test]
@@ -38,8 +38,8 @@ final class IssueDateTest extends TestCase
                 '2024-07-10 13:42:18',
                 new DateTimeZone('Europe/Brussels'),
             ),
-        ) )->with_format('Y/m/d');
+        ) )->withFormat('Y/m/d');
 
-        $this->assertSame('2024/07/10', $date->as_string());
+        $this->assertSame('2024/07/10', $date->toString());
     }
 }

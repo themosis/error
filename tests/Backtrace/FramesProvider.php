@@ -10,7 +10,7 @@ namespace Themosis\Components\Error\Tests\Backtrace;
 
 final class FramesProvider
 {
-    public static function class_with_static_method(): array
+    public static function classWithStaticMethod(): array
     {
         return [
             'file'     => '/disk/web/project/app/Something.php',
@@ -22,7 +22,7 @@ final class FramesProvider
         ];
     }
 
-    public static function class_with_instance_method(): array
+    public static function classWithInstanceMethod(): array
     {
         return [
             'file'     => '/disk/web/project/app/Foo.php',
@@ -33,7 +33,7 @@ final class FramesProvider
         ];
     }
 
-    public static function file_with_include(): array
+    public static function fileWithInclude(): array
     {
         return [
             'file'     => '/disk/web/project/app/config.php',
@@ -45,7 +45,7 @@ final class FramesProvider
         ];
     }
 
-    public static function vendor_class_with_instance_method(): array
+    public static function vendorClassWithInstanceMethod(): array
     {
         return [
             'file'     => '/disk/web/project/vendor/third-party/some-package/Runner.php',

@@ -27,7 +27,7 @@ final class ReportHandler
 
     public function publish(): void
     {
-        $should_stop = static function (Reporter $reporter): Closure {
+        $shouldStop = static function (Reporter $reporter): Closure {
             return static function (Issue $issue) use ($reporter): bool {
                 return $reporter instanceof HaltReporter && $reporter->stop($issue);
             };
@@ -35,19 +35,19 @@ final class ReportHandler
 
         array_reduce(
             $this->issues->all(),
-            static function (callable $reporters_for, Issue $issue) use ($should_stop) {
-                foreach ($reporters_for($issue) as $reporter) {
+            static function (callable $reportersFor, Issue $issue) use ($shouldStop) {
+                foreach ($reportersFor($issue) as $reporter) {
                     /** @var Reporter $reporter */
                     $reporter->report($issue);
 
-                    if ($should_stop($reporter)($issue)) {
+                    if ($shouldStop($reporter)($issue)) {
                         break;
                     }
                 }
 
-                return $reporters_for;
+                return $reportersFor;
             },
-            $this->reporters->get_allowed_reporters(...)
+            $this->reporters->getAllowedReporters(...)
         );
     }
 }

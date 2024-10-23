@@ -12,5 +12,5 @@ interface Information
 {
     public function add(?InformationGroup $info): void;
 
-    public function get_information_by_priority(): array;
+    public function getInformationByPriority(): array;
 }

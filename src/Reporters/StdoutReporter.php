@@ -21,7 +21,7 @@ final class StdoutReporter implements Reporter
 
     public function report(Issue $issue): void
     {
-        $backtrace = $this->backtrace->capture_exception($issue->exception());
+        $backtrace = $this->backtrace->captureException($issue->exception());
 
         printf(
             "[%s] %s\n%s\n",

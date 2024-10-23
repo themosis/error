@@ -32,10 +32,10 @@ final class ExceptionHandlerTest extends TestCase
             reporter: new CallbackReporter(
                 static function (Issue $issue) {
                     $backtrace = new Backtrace(new InMemoryFrameIdentifiers());
-                    $backtrace->capture_exception($issue->exception());
+                    $backtrace->captureException($issue->exception());
 
                     ( new ExceptionHandlerHttpResponse(
-                        view_path: __DIR__ . '/../resources/views/exception.php',
+                        viewPath: __DIR__ . '/../resources/views/exception.php',
                         backtrace: $backtrace,
                         information: new InMemoryInformation(),
                     ) )->render($issue);
@@ -43,17 +43,17 @@ final class ExceptionHandlerTest extends TestCase
             ),
         );
 
-        $report_handler = new ReportHandler(
+        $reportHandler = new ReportHandler(
             reporters: $reporters,
             issues: new InMemoryIssues(),
         );
 
-        $report_handler->capture(
-            Issue::from_exception(new Exception('Oops'))
+        $reportHandler->capture(
+            Issue::fromException(new Exception('Oops'))
         );
 
         ob_start();
-            $report_handler->publish();
+            $reportHandler->publish();
         $stdout = ob_get_clean();
 
         $this->assertTrue(str_contains($stdout, 'Oops'));
