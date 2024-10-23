@@ -16,7 +16,7 @@ final class CustomFrameTag extends AbstractFrameTag
         private string $slug,
         private string $name,
     ) {
-        if ($this->slug_has_invalid_format($this->slug)) {
+        if ($this->slugHasInvalidFormat($this->slug)) {
             throw new InvalidFrameTagArgument(
                 message: sprintf('Frame tag slug "%s" is not valid. Use only lowercase letters and underscores.', $this->slug),
             );
@@ -29,18 +29,18 @@ final class CustomFrameTag extends AbstractFrameTag
         }
     }
 
-    private function slug_has_invalid_format(string $slug): bool
+    private function slugHasInvalidFormat(string $slug): bool
     {
         if (empty($slug)) {
             return true;
         }
 
-        $is_matching = preg_match(
+        $isMatching = preg_match(
             pattern: '/[^a-z_]+/',
             subject: $slug,
         );
 
-        if (1 === $is_matching) {
+        if (1 === $isMatching) {
             return true;
         }
 

@@ -11,19 +11,19 @@ namespace Themosis\Components\Error\Backtrace;
 final class ClassFunction implements FrameClassFunction
 {
     public function __construct(
-        private string $class_name,
-        private string $function_name,
+        private string $className,
+        private string $functionName,
         private string $type,
     ) {
     }
 
     public function get_class(): string
     {
-        return $this->class_name;
+        return $this->className;
     }
 
     public function __toString(): string
     {
-        return sprintf('%s%s%s()', $this->class_name, $this->type, $this->function_name);
+        return sprintf('%s%s%s()', $this->className, $this->type, $this->functionName);
     }
 }

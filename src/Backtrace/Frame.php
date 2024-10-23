@@ -15,7 +15,7 @@ use Traversable;
 
 final class Frame implements Stringable, IteratorAggregate
 {
-    private array $raw_frame;
+    private array $rawFrame;
     private FrameFunction $function;
     private File $file;
     private ?object $object;
@@ -28,7 +28,7 @@ final class Frame implements Stringable, IteratorAggregate
 
     public function __construct(array $frame)
     {
-        $this->raw_frame = $frame;
+        $this->rawFrame = $frame;
 
         $this->file = new File(
             filepath: $frame['file'] ?? null,
@@ -37,16 +37,16 @@ final class Frame implements Stringable, IteratorAggregate
 
         $this->function = isset($frame['class'])
             ? new ClassFunction(
-                class_name: $frame['class'],
-                function_name: $frame['function'],
+                className: $frame['class'],
+                functionName: $frame['function'],
                 type: $frame['type'],
             )
             : new PhpFunction(
-                function_name: $frame['function'],
+                functionName: $frame['function'],
             );
 
         $this->object = $frame['object'] ?? null;
-        $this->args   = $frame['args'] ?? [];
+        $this->args = $frame['args'] ?? [];
     }
 
     public function add_tag(FrameTag ...$tags): void
@@ -68,32 +68,32 @@ final class Frame implements Stringable, IteratorAggregate
 
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->raw_frame);
+        return new ArrayIterator($this->rawFrame);
     }
 
-    public function get_function(): FrameFunction
+    public function getFunction(): FrameFunction
     {
         return $this->function;
     }
 
-    public function get_file(): File
+    public function getFile(): File
     {
         return $this->file;
     }
 
-    public function get_object(): ?object
+    public function getObject(): ?object
     {
         return $this->object;
     }
 
-    public function get_args(): array
+    public function getArgs(): array
     {
         return $this->args;
     }
 
-    public function as_array(): array
+    public function toArray(): array
     {
-        return $this->raw_frame;
+        return $this->rawFrame;
     }
 
     public function __toString(): string

@@ -11,9 +11,9 @@ namespace Themosis\Components\Error\Backtrace;
 final class VendorFrameIdentifier implements FrameIdentifier
 {
     public function __construct(
-        private string $project_root_path,
+        private string $projectRootPath,
     ) {
-        $this->project_root_path = rtrim($this->project_root_path, '\/');
+        $this->projectRootPath = rtrim($this->projectRootPath, '\/');
     }
 
     public function tag(): FrameTag
@@ -23,15 +23,15 @@ final class VendorFrameIdentifier implements FrameIdentifier
 
     public function identify(Frame $frame): bool
     {
-        $path = $frame->get_file()->path();
+        $path = $frame->getFile()->path();
 
         if (empty($path)) {
             return false;
         }
 
-        $relative_path = str_replace($this->project_root_path, '', $path);
+        $relativePath = str_replace($this->projectRootPath, '', $path);
 
-        if (str_contains($relative_path, 'vendor')) {
+        if (str_contains($relativePath, 'vendor')) {
             return true;
         }
 

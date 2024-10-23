@@ -20,7 +20,7 @@ final class File implements Stringable
         ?int $line,
     ) {
         $this->filepath = $filepath;
-        $this->line     = $line ?? 1;
+        $this->line = $line ?? 1;
     }
 
     public function path(): string
