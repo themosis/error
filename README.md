@@ -68,7 +68,7 @@ $handler = new ReportHandler(
 );
 
 // Capture an issue.
-$handler->capture(ExceptionIssue::create(new Exception('Oops!')));
+$handler->capture(ExceptionalIssue::create(new Exception('Oops!')));
 
 // Publish the captured issues.
 $handler->publish();
