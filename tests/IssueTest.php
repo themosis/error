@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Themosis\Components\Error\Tests;
 
 use PHPUnit\Framework\Attributes\Test;
-use Themosis\Components\Error\Issue;
+use Themosis\Components\Error\ExceptionalIssue;
 
 final class IssueTest extends TestCase
 {
@@ -18,7 +18,7 @@ final class IssueTest extends TestCase
     {
         $exception = new FakeException('Something went wrong with the order.');
 
-        $issue = Issue::fromException($exception);
+        $issue = ExceptionalIssue::create($exception);
 
         $information = $issue->info();
 

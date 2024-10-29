@@ -15,6 +15,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\Test;
 use Themosis\Components\Error\Backtrace\Backtrace;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
+use Themosis\Components\Error\ExceptionalIssue;
 use Themosis\Components\Error\InMemoryIssues;
 use Themosis\Components\Error\InMemoryReporters;
 use Themosis\Components\Error\Issue;
@@ -41,7 +42,7 @@ final class ReportHandlerTest extends TestCase
             reporter: new StdoutReporter($backtrace)
         );
 
-        $issue = Issue::fromException(
+        $issue = ExceptionalIssue::create(
             exception: $exception = new Exception('There was an error...'),
             occuredAt: $date = new DateTimeImmutable('now'),
         );
@@ -90,7 +91,7 @@ final class ReportHandlerTest extends TestCase
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::fromException(
+            issue: ExceptionalIssue::create(
                 exception: $exception = new Exception('There was an error...'),
                 occuredAt: $date = new DateTimeImmutable('now'),
             ),
@@ -129,7 +130,7 @@ final class ReportHandlerTest extends TestCase
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::fromException(
+            issue: ExceptionalIssue::create(
                 exception: new Exception('Something went wrong!'),
                 occuredAt: new DateTimeImmutable('now'),
             ),
@@ -162,13 +163,13 @@ final class ReportHandlerTest extends TestCase
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::fromException(
+            issue: ExceptionalIssue::create(
                 exception: $exception_a = new Exception('Error AAA'),
                 occuredAt: $date_a = new DateTimeImmutable('2 days ago'),
             ),
         );
         $issues->add(
-            issue: Issue::fromException(
+            issue: ExceptionalIssue::create(
                 exception: $exception_b = new Exception('Error BBB'),
                 occuredAt: $date_b = new DateTimeImmutable('now'),
             ),
@@ -221,13 +222,13 @@ final class ReportHandlerTest extends TestCase
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::fromException(
+            issue: ExceptionalIssue::create(
                 exception: new Exception('Error AAA'),
                 occuredAt: new DateTimeImmutable('2 days ago'),
             ),
         );
         $issues->add(
-            issue: Issue::fromException(
+            issue: ExceptionalIssue::create(
                 exception: new Exception('Error BBB'),
                 occuredAt: new DateTimeImmutable('now'),
             ),
@@ -268,7 +269,7 @@ final class ReportHandlerTest extends TestCase
 
         $issues = new InMemoryIssues();
         $issues->add(
-            issue: Issue::fromException(
+            issue: ExceptionalIssue::create(
                 exception: new Exception('Oops!'),
             ),
         );
@@ -319,7 +320,7 @@ final class ReportHandlerTest extends TestCase
             issues: new InMemoryIssues(),
         );
 
-        $handler->capture(Issue::fromException(new Exception('Oops!')));
+        $handler->capture(ExceptionalIssue::create(new Exception('Oops!')));
 
         ob_start();
         $handler->publish();
@@ -358,7 +359,7 @@ final class ReportHandlerTest extends TestCase
             issues: new InMemoryIssues(),
         );
 
-        $handler->capture(Issue::fromException(new Exception('Oops!')));
+        $handler->capture(ExceptionalIssue::create(new Exception('Oops!')));
 
         ob_start();
         $handler->publish();

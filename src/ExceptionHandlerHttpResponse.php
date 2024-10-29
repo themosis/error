@@ -10,6 +10,7 @@ namespace Themosis\Components\Error;
 
 use Closure;
 use Themosis\Components\Error\Backtrace\Backtrace;
+use Themosis\Components\Error\Backtrace\File;
 use Themosis\Components\Error\Backtrace\FilePreview;
 use Themosis\Components\Error\Backtrace\FilePreviewLine;
 use Themosis\Components\Error\Backtrace\Frame;
@@ -43,7 +44,16 @@ final class ExceptionHandlerHttpResponse
                 'exceptionClass' => get_class($exception),
                 'file' => sprintf('%s:%s', $exception->getFile(), $exception->getLine()),
                 'preview' => function (Closure $previewCallback, Closure $lineCallback) use ($issue) {
-                    return $this->renderPreview($issue->preview(), $previewCallback, $lineCallback);
+                    return $this->renderPreview(
+                        file: new FilePreview(
+                            file: new File(
+                                filepath: $issue->exception()->getFile(),
+                                line: $issue->exception()->getLine(),
+                            ),
+                        ),
+                        previewCallback: $previewCallback,
+                        lineCallback: $lineCallback
+                    );
                 },
                 'frames' => function (
                     Closure $framesCallback,

@@ -9,8 +9,9 @@ declare(strict_types=1);
 namespace Themosis\Components\Error;
 
 use DateTimeImmutable;
+use Stringable;
 
-final class IssueDate
+final class IssueDate implements Stringable
 {
     private string $format = DateTimeImmutable::W3C;
 
@@ -29,5 +30,10 @@ final class IssueDate
     public function toString(): string
     {
         return $this->datetime->format($this->format);
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
     }
 }

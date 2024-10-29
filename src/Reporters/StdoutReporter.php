@@ -25,7 +25,7 @@ final class StdoutReporter implements Reporter
 
         printf(
             "[%s] %s\n%s\n",
-            $issue->date(),
+            $issue->date()->toString(),
             $issue->message(),
             (string) $backtrace
         );

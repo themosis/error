@@ -23,7 +23,7 @@ final class ErrorHandler
 
         if ($this->isDeprecation($errno)) {
             $this->reportHandler
-                ->capture(Issue::fromException($error))
+                ->capture(ExceptionalIssue::create($error))
                 ->publish();
 
             return true;

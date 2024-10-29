@@ -12,6 +12,7 @@ use Exception;
 use PHPUnit\Framework\Attributes\Test;
 use Themosis\Components\Error\Backtrace\Backtrace;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
+use Themosis\Components\Error\ExceptionalIssue;
 use Themosis\Components\Error\ExceptionHandlerHttpResponse;
 use Themosis\Components\Error\InMemoryInformation;
 use Themosis\Components\Error\InMemoryIssues;
@@ -49,7 +50,7 @@ final class ExceptionHandlerTest extends TestCase
         );
 
         $reportHandler->capture(
-            Issue::fromException(new Exception('Oops'))
+            ExceptionalIssue::create(new Exception('Oops'))
         );
 
         ob_start();
