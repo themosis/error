@@ -51,3 +51,78 @@ A `Reporter` is an interface that represents any PHP class that can report an `I
 
 An `Issue` is an interface that represents an error or any custom problem in your application that you want to report.
 
+Depending on your needs, you can configure multiple report handlers withing your application. Here is a basic configuration example where we always report to the stdout:
+
+```php
+$reporters = new InMemoryReporters();
+$reporters->add(
+    condition: new AlwaysReport(),
+    reporter: new CallbackReporter(static function (Issue $issue) {
+        echo $issue->message().PHP_EOL;
+    }),
+);
+
+$handler = new ReportHandler(
+    reporters: $reporters,
+    issues: new InMemoryIssues(),
+);
+
+// Capture an issue.
+$handler->capture(ExceptionIssue::create(new Exception('Oops!')));
+
+// Publish the captured issues.
+$handler->publish();
+```
+
+Let's decompose the above example...
+
+### Reporters
+
+The `InMemoryReporters` class is a repository that contains all declared reporters. When you declare a reporter using the `add()` method, you must provide 2 parameters:
+
+1. A condition
+2. A reporter
+
+#### Report Condition
+
+The first required parameter is a report condition. The condition instance is reponsible to evaluate if the linked reporter must be evaluated or not. There are builtin conditions with the package: `AlwaysReport`, `Dont` and `CallbackCondition` but you can also build your own.
+
+The `Dont` condition will inverse the result of the encapsulated condition:
+
+```php
+// The following reporter will never be called.
+$reporters->add(
+    condition: new Dont(new AlwaysReport()),
+    reporter: ...
+);
+```
+
+The `CallbackCondition` accepts a callback as a parameter to let you evaluate if the issue should be reported or not. The given callback has the `Issue` as an argument:
+
+```php
+// The following reporter will only report RuntimeException issues.
+$reporters->add(
+    condition: new CallbackCondition(static function (Issue $issue) {
+        return $issue instanceof RuntimeException;
+    }),
+    reporter: ...
+);
+```
+
+You can build your own condition class by implementing the `ReportCondition` interface. The interface exposes a `can()` method that receives an `Issue` as a parameter and must return a `boolean` value:
+
+```php
+<?php
+
+class TerminalCondition implements ReportCondition
+{
+    public function can(Issue $issue): bool
+    {
+        return php_sapi_name() === 'cli';
+    }
+}
+```
+
+#### Reporter
+
+
