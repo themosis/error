@@ -221,7 +221,6 @@ $reporters->add(
         $backtrace->captureException($issue->exception());
 
         (new ExceptionHandlerHttpResponse(
-            viewPath: __DIR__.'/path/to/resources/views/exception.php',
             backtrace: $backtrace,
             information: new InMemoryInformation(),
         ))->render($issue);
