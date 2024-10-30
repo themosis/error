@@ -190,4 +190,54 @@ The `ErrorHandler` captures all triggered PHP errors. The current implementation
 
 ### PHP Exception Handler
 
+You can register a `ReportHandler` instance as the default PHP exception handler. See the [set_exception_handler()](https://www.php.net/manual/en/function.set-exception-handler.php) function in the PHP documentation for details.
+
+Just like for the PHP errors, the package provides a pre-configured class can be register a `ReportHandler` instance and hook it up as the default PHP exception handler.
+Simply pass an `ExceptionHandler` class instance to the `set_exception_handler` PHP function like so:
+
+```php
+<?php
+
+$reportHandler = new ReportHandler(
+    reporters: new InMemoryReporters(),
+    issues: new InMemoryIssues(),
+);
+
+set_exception_handler(new ExceptionHandler($reportHandler));
+```
+
+#### HTML Error Report Template
+
+On a web context, you might want to render thrown exceptions in the browser during development to easily debug your application. The package also provides a HTML template with a light and a dark theme. Here is an example on how to use the `ExceptionHandlerHttpResponse` class that is responsible to prepare the data for usage in the `resources/views/exception.php` file from this package:
+
+```php
+<?php
+
+$reporters = new InMemoryReporters();
+$reporters->add(
+    condition: new AlwaysReport(), // You might want to constraint this for "local" and "web" environments
+    reporter: new CallbackReporter(static function (Issue $issue) {
+        $backtrace = new Backtrace(new InMemoryFrameIdentifiers());
+        $backtrace->captureException($issue->exception());
+
+        (new ExceptionHandlerHttpResponse(
+            viewPath: __DIR__.'/path/to/resources/views/exception.php',
+            backtrace: $backtrace,
+            information: new InMemoryInformation(),
+        ))->render($issue);
+    }),
+);
+
+$reportHandler = new ReportHandler(
+    reporters: $reporters,
+    issues: new InMemoryIssues(),
+);
+
+set_exception_handler(new ExceptionHandler($reportHandler));
+```
+
+The above code snippet is attaching a `ReportHandler` to the default PHP exception handler. The report handler contains one reporter that is exposing any thrown exceptions to the standard output using HTML.
+
+> The attached condition is to always report the issue to the stdout. On your application, make sure to constraint the condition to avoid rendering the error HTML template on a production environment.
+
 
