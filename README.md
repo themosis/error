@@ -35,9 +35,9 @@ Introduction
 The package provides 2 components to help you interact with PHP errors and exceptions:
 
 1. [Report Handler](#report-handler)
-  - [Reporters](#reporters)
-  - [PHP Error Handler](#php-error-handler)
-  - [PHP Exception Handler](#php-exception-handler)
+    - [Reporters](#reporters)
+    - [PHP Error Handler](#php-error-handler)
+    - [PHP Exception Handler](#php-exception-handler)
 2. [Backtrace](#backtrace)
 
 Report Handler
