@@ -55,4 +55,16 @@ final class InformationGroup
     {
         return $this->information;
     }
+
+    /**
+     * @return array<string,string>
+     */
+    public function toArray(): array
+    {
+        return array_reduce($this->getInformation(), static function (array $carry, Info $info) {
+            $carry[$info->name()] = $info->value();
+
+            return $carry;
+        }, []);
+    }
 }

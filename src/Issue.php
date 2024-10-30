@@ -19,4 +19,6 @@ interface Issue
     public function level(): Level;
 
     public function exception(): Throwable;
+
+    public function info(): ?InformationGroup;
 }
