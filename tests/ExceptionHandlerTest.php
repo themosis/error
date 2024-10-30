@@ -36,7 +36,6 @@ final class ExceptionHandlerTest extends TestCase
                     $backtrace->captureException($issue->exception());
 
                     ( new ExceptionHandlerHttpResponse(
-                        viewPath: __DIR__ . '/../resources/views/exception.php',
                         backtrace: $backtrace,
                         information: new InMemoryInformation(),
                     ) )->render($issue);

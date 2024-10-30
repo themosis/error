@@ -18,11 +18,20 @@ use Themosis\Components\Error\Backtrace\FrameTag;
 
 final class ExceptionHandlerHttpResponse
 {
+    private string $viewPath;
+
     public function __construct(
-        private string $viewPath,
         private Backtrace $backtrace,
         private Information $information,
     ) {
+        $this->viewPath = realpath(__DIR__ . '/../resources/views/exception.php');
+    }
+
+    public function withView(string $viewPath): static
+    {
+        $this->viewPath = $viewPath;
+
+        return $this;
     }
 
     public function render(Issue $issue): void
