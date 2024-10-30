@@ -178,12 +178,12 @@ The package provides a pre-configured class that can register a `ReportHandler` 
 ```php
 <?php
 
-$errorReporter = new ErrorReporter(
+$reportHandler = new ReportHandler(
     reporters: new InMemoryReporters(),
     issues: new InMemoryIssues(),
 );
 
-set_error_handler(new ErrorHandler($errorReporter));
+set_error_handler(new ErrorHandler($reportHandler));
 ```
 
 The `ErrorHandler` captures all triggered PHP errors. The current implementation is only reporting the **deprecated** errors (E_DEPRECATED, E_USER_DEPRECATED) with the given `ErrorReporter` instance. All other errors are converted to an `ErrorException` and are thrown so the default PHP exception handler can capture them.
