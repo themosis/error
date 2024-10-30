@@ -35,6 +35,9 @@ Introduction
 The package provides 2 components to help you interact with PHP errors and exceptions:
 
 1. [Report Handler](#report-handler)
+  - [Reporters](#reporters)
+  - [PHP Error Handler](#php-error-handler)
+  - [PHP Exception Handler](#php-exception-handler)
 2. [Backtrace](#backtrace)
 
 Report Handler
@@ -124,5 +127,67 @@ class TerminalCondition implements ReportCondition
 ```
 
 #### Reporter
+
+The second required parameter is a reporter instance. A reporter is one executable element attached to the report handler and it is evaluated if its related condition is true.
+
+There is a generic builtin `CallbackReporter` class provided by the package. The `CallbackReporter` accepts a function as a parameter, which receives the `Issue` as an argument:
+
+```php
+$reporters->add(
+    condition: new AlwaysReport(),
+    reporter: new CallbackReporter(static function (Issue $issue) {
+        echo $issue->message().PHP_EOL;
+    }),
+);
+```
+
+The above example is simply reporting the issue message to the standard output (stdout).
+
+You can build your own reporter classes by implementing the `Reporter` interface. The interface exposes a `report()` method that receives the `Issue` as an argument:
+
+```php
+<?php
+
+use Psr\Log\LoggerInterface;
+use Themosis\Components\Error\Issue;
+use Themosis\Components\Error\Reporter;
+
+class LogReporter implements Reporter
+{
+    public function __construct(
+        private LoggerInterface $logger,
+    )
+    {}
+
+    public function report(Issue $issue): void
+    {
+        $this->logger->error(
+            message: $issue->message(),
+            context: $issue->info()?->toArray() ?? [],
+        );
+    }
+}
+```
+
+### PHP Error Handler
+
+You can hook a `ReportHandler` instance as the default PHP error handler. See the [set_error_handler()](https://www.php.net/manual/en/function.set-error-handler.php) function in the PHP documentation for details.
+
+The package provides a pre-configured class that can register a `ReportHandler` instance and hook it up as the default PHP error handler. Simply pass an `ErrorHandler` class instance to the `set_error_handler` PHP function like so:
+
+```php
+<?php
+
+$errorReporter = new ErrorReporter(
+    reporters: new InMemoryReporters(),
+    issues: new InMemoryIssues(),
+);
+
+set_error_handler(new ErrorHandler($errorReporter));
+```
+
+The `ErrorHandler` captures all triggered PHP errors. The current implementation is only reporting the **deprecated** errors (E_DEPRECATED, E_USER_DEPRECATED) with the given `ErrorReporter` instance. All other errors are converted to an `ErrorException` and are thrown so the default PHP exception handler can capture them.
+
+### PHP Exception Handler
 
 
