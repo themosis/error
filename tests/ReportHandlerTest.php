@@ -293,7 +293,7 @@ final class ReportHandlerTest extends TestCase
     {
         $reporters = new InMemoryReporters();
         $reporters->add(
-            condition: new Dont(new AlwaysReport()),
+            condition: new CallbackCondition(static fn () => false),
             reporter: new CallbackReporter(
                 function (Issue $issue) {
                     echo 'Should Not Be Reported!';

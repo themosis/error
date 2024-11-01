@@ -88,17 +88,9 @@ The `InMemoryReporters` class is a repository that contains all declared reporte
 
 #### Report Condition
 
-The first required parameter is a report condition. The condition instance is reponsible to evaluate if the linked reporter must be evaluated or not. There are builtin conditions with the package: `AlwaysReport`, `Dont` and `CallbackCondition` but you can also build your own.
+The first required parameter is a report condition. The condition instance is reponsible to evaluate if the linked reporter must be evaluated or not. There are builtin conditions with the package: `AlwaysReport` and `CallbackCondition` but you can also build your own.
 
-The `Dont` condition will inverse the result of the encapsulated condition:
-
-```php
-// The following reporter will never be called.
-$reporters->add(
-    condition: new Dont(new AlwaysReport()),
-    reporter: ...
-);
-```
+The `AlwaysReport` consition, as its name implies, is always reporting the attached reporter.
 
 The `CallbackCondition` accepts a callback as a parameter to let you evaluate if the issue should be reported or not. The given callback has the `Issue` as an argument:
 
