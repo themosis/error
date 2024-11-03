@@ -231,4 +231,5 @@ The above code snippet is attaching a `ReportHandler` to the default PHP excepti
 
 > The attached condition is to always report the issue to the stdout. On your application, make sure to constraint the condition to avoid rendering the error HTML template on a production environment.
 
-
+Backtrace
+---------

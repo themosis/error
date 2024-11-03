@@ -21,4 +21,6 @@ interface Issue
     public function exception(): Throwable;
 
     public function info(): ?InformationGroup;
+
+    public function stack(): array;
 }

@@ -23,7 +23,6 @@ use Themosis\Components\Error\Reporters\AlwaysStopAfter;
 use Themosis\Components\Error\Reporters\CallbackReporter;
 use Themosis\Components\Error\Reporters\Conditions\AlwaysReport;
 use Themosis\Components\Error\Reporters\Conditions\CallbackCondition;
-use Themosis\Components\Error\Reporters\Conditions\Dont;
 use Themosis\Components\Error\Reporters\LogReporter;
 use Themosis\Components\Error\Reporters\StdoutReporter;
 use Themosis\Components\Error\ReportHandler;

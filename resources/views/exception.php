@@ -136,14 +136,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
             width: 100%;
         }
 
-        #issue {
-            --section-bg: linear-gradient(to bottom right, var(--color-red-100) 30%, var(--color-red-300));
-            padding: 0;
-        }
-
-        #exception {
-            padding: var(--space-md);
-        }
 
         .section {
             --_section-bg: var(--section-bg, var(--color-gray-300));
@@ -155,6 +147,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
         .section:target {
             --section-bg: linear-gradient(to bottom right, var(--color-gray-300), var(--color-blue-300));
+        }
+
+        #issue .section {
+            --section-bg: linear-gradient(to bottom right, var(--color-red-100) 30%, var(--color-red-300));
         }
 
         .section-title {
@@ -254,9 +250,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
             color: var(--color-red-800);
         }
 
-        #backtrace {
-            padding: var(--space-md);
-            border-top: 1px solid var(--color-red-200);
+        .backtrace {
+            padding-top: var(--space-lg);
         }
 
         .frame {
@@ -356,11 +351,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
             .section {
                 padding: var(--space-lg);
             }
-
-            #exception,
-            #backtrace {
-                padding: var(--space-lg);
-            }
         }
 
         @media screen and (min-width: 1024px) {
@@ -374,6 +364,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
             #sidebar {
                 height: calc(100% - (var(--space-md) * 2));
+            }
+
+            .nav li a,
+            .nav li a:link,
+            .nav li a:visited {
+                padding: var(--space-sm);
             }
 
             .wrapper {
@@ -411,7 +407,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 --section-bg: var(--color-gray-800);
             }
 
-            #issue {
+            #issue .section {
                 --section-bg: linear-gradient(to bottom right, var(--color-red-800) 30%, var(--color-red-900));
             }
 
@@ -419,10 +415,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 --section-bg: linear-gradient(to bottom right, var(--color-gray-800), var(--color-blue-800));
             }
             
-            #backtrace {
-                border-top: 1px solid var(--color-red-900);
-            }
-
             .message {
                 color: var(--color-blue-100);
             }
@@ -467,7 +459,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             }
 
             .frame {
-                background: var(--color-blue-900);
+                background: var(--color-blue-800);
             }
 
             .frame:hover {
@@ -481,6 +473,24 @@ SPDX-License-Identifier: GPL-3.0-or-later
             .frame-function {
                 --identifier-bg: var(--color-gray-900);
                 --identifier-color: var(--color-blue-300);
+            }
+
+            .frame .line {
+                background: var(--color-blue-900);
+            }
+
+            .frame .line:nth-of-type(even) {
+                background: var(--color-blue-800);
+            }
+
+            .frame .current-line,
+            .frame .line.current-line {
+                background: var(--color-yellow-500);
+            }
+
+            .frame .current-line .line-number, 
+            .frame .current-line:nth-of-type(even) .line-number {
+                color: var(--color-red-800);
             }
 
             .info-key {
@@ -510,55 +520,56 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </aside>
         <main id="main">
             <div class="wrapper">
-                <section id="issue" class="section">
-                    <div id="exception">
-                        <h2 class="section-title"><?= $exceptionClass ?></h2>
-                        <p class="message"><?= $message ?></p>
-                        <p class="file"><?= $file ?></p>
-                        <?= $preview(
-                        $renderPreview = fn (string $lines) => <<<PREVIEW
-                            <div class="preview">
-                                <pre>
-                                    <code>{$lines}</code>
-                                </pre>
-                            </div>
-                        PREVIEW,
-                        $renderPreviewLine = fn (string $className, int $length, int $number, string $line) => <<<LINE
-                            <span class="line {$className}"><span class="line-number" style="min-width: calc(10px * {$length});">{$number}</span><span class="line-content">{$line}</span></span>
-                        LINE); ?>
-                    </div>
-                    <?= $frames(
-                        fn(string $frames) => <<<BACKTRACE
-                            <div id="backtrace">{$frames}</div>
-                        BACKTRACE,
-                        fn(string $function, string $file, string $tags, string $preview) => <<<FRAME
-                            <details name="backtrace" class="frame">
-                                <summary>
-                                    <div class="frame-identifiers">
-                                        <span class="frame-identifier frame-function">{$function}</span>
-                                        {$tags}
-                                    </div> 
-                                    <p>{$file}</p>
-                                </summary>
+                <section id="issue"><?= $issues(
+                    fn (string $exceptionClass, string $message, string $file, string $preview, string $backtrace) => <<<ISSUE
+                        <div class="section">
+                            <div class="issue">
+                                <h2 class="section-title">{$exceptionClass}</h2>
+                                <p class="message">{$message}</p>
+                                <p class="file">{$file}</p>
                                 {$preview}
-                            </details>
-                        FRAME,
-                        fn(string $tagname) => <<<TAG
-                            <span class="frame-identifier">{$tagname}</span>
-                        TAG,
-                        $renderPreview,
-                        $renderPreviewLine
-                    ); ?>
-                </section>
+                                {$backtrace}
+                            </div>
+                        </div>
+                    ISSUE,
+                    fn (string $lines) => <<<PREVIEW
+                        <div class="preview">
+                            <pre>
+                                <code>{$lines}</code>
+                            </pre>
+                        </div>
+                    PREVIEW,
+                    fn (string $className, int $length, int $number, string $line) => <<<LINE
+                        <span class="line {$className}"><span class="line-number" style="min-width: calc(10px * {$length});">{$number}</span><span class="line-content">{$line}</span></span>
+                    LINE,
+                    fn(string $frames) => <<<BACKTRACE
+                        <div class="backtrace">{$frames}</div>
+                    BACKTRACE,
+                    fn(string $function, string $file, string $tags, string $preview) => <<<FRAME
+                        <details name="backtrace" class="frame">
+                            <summary>
+                                <div class="frame-identifiers">
+                                    <span class="frame-identifier frame-function">{$function}</span>
+                                    {$tags}
+                                </div> 
+                                <p>{$file}</p>
+                            </summary>
+                            {$preview}
+                        </details>
+                    FRAME,
+                    fn(string $tagname) => <<<TAG
+                        <span class="frame-identifier">{$tagname}</span>
+                    TAG,
+                ) ?></section>
                 <?= $information(
                     fn (string $infogroups) => <<<INFORMATION
-                        <div class="information">{$infogroups}</div>
+                        <section class="information">{$infogroups}</section>
                     INFORMATION,
                     fn (string $slug, string $title, string $infos) => <<<INFOGROUP
-                        <section id="{$slug}" class="section">
+                        <div id="{$slug}" class="section">
                             <h2 class="section-title">{$title}</h2>
                             <div class="infos">{$infos}</div>
-                        </section>
+                        </div>
                     INFOGROUP,
                     fn (string $label, string $value) => <<<INFO
                         <dl class="info">

@@ -38,60 +38,70 @@ final class ExceptionHandlerHttpResponse
     {
         $content = static function (string $path, array $data = []) {
             // phpcs:ignore
-			extract( $data );
+			extract($data);
 
             return require $path;
         };
 
-        $this->information->add($issue->info());
+        $prepareInformation = function (array $stack): void {
+            array_map(function (Issue $issue): void {
+                $this->information->add($issue->info());
+            }, $stack);
+        };
 
-        $exception = $issue->exception();
+        $prepareInformation($stack = $issue->stack());
 
         $content(
             $this->viewPath,
             [
                 'title' => $issue->message(),
-                'message' => $issue->message(),
-                'exceptionClass' => get_class($exception),
-                'file' => sprintf('%s:%s', $exception->getFile(), $exception->getLine()),
-                'preview' => function (Closure $previewCallback, Closure $lineCallback) use ($issue) {
-                    return $this->renderPreview(
-                        file: new FilePreview(
-                            file: new File(
-                                filepath: $issue->exception()->getFile(),
-                                line: $issue->exception()->getLine(),
-                            ),
-                        ),
-                        previewCallback: $previewCallback,
-                        lineCallback: $lineCallback
-                    );
-                },
-                'frames' => function (
-                    Closure $framesCallback,
-                    Closure $frameCallback,
-                    Closure $tagCallback,
+                'issues' => function (
+                    Closure $issueCallback,
                     Closure $previewCallback,
                     Closure $lineCallback,
-                ) {
-                    if (empty($this->backtrace->frames())) {
-                        return;
-                    }
+                    Closure $framesCallback,
+                    Closure $frameCallback,
+                    Closure $tagCallback
+                ) use ($stack) {
+                    $issues = array_map(
+                        function (Issue $stackIssue) use (
+                            $issueCallback,
+                            $previewCallback,
+                            $lineCallback,
+                            $framesCallback,
+                            $frameCallback,
+                            $tagCallback
+                        ) {
+                            $exception = $stackIssue->exception();
 
-                    $frames = array_map(
-                        fn (Frame $frame) => $frameCallback(
-                            function: htmlentities((string) $frame->getFunction()),
-                            file: htmlentities((string) $frame->getFile()),
-                            tags: $this->renderTags($frame, $tagCallback),
-                            preview: $this->renderPreview(
-                                new FilePreview($frame->getFile()),
-                                $previewCallback,
-                                $lineCallback
-                            ),
-                        ),
-                        $this->backtrace->frames()
+                            return $issueCallback(
+                                exceptionClass: get_class($exception),
+                                message: $stackIssue->message(),
+                                file: sprintf('%s:%s', $exception->getFile(), $exception->getLine()),
+                                preview: $this->renderPreview(
+                                    file: new FilePreview(
+                                        file: new File(
+                                            filepath: $exception->getFile(),
+                                            line: $exception->getLine(),
+                                        ),
+                                    ),
+                                    previewCallback: $previewCallback,
+                                    lineCallback: $lineCallback,
+                                ),
+                                backtrace: $this->renderBacktrace(
+                                    $stackIssue,
+                                    $framesCallback,
+                                    $frameCallback,
+                                    $tagCallback,
+                                    $previewCallback,
+                                    $lineCallback
+                                ),
+                            );
+                        },
+                        $stack
                     );
 
-                    return $framesCallback(implode(PHP_EOL, $frames));
+                    return implode(PHP_EOL, $issues);
                 },
                 'information' => function (
                     Closure $informationCallback,
@@ -139,6 +149,37 @@ final class ExceptionHandlerHttpResponse
                 },
             ]
         );
+    }
+
+    private function renderBacktrace(
+        Issue $issue,
+        Closure $framesCallback,
+        Closure $frameCallback,
+        Closure $tagCallback,
+        Closure $previewCallback,
+        Closure $lineCallback
+    ): string {
+        $this->backtrace->captureException($issue->exception());
+
+        if (empty($this->backtrace->frames())) {
+            return '';
+        }
+
+        $frames = array_map(
+            fn (Frame $frame) => $frameCallback(
+                function: htmlentities((string) $frame->getFunction()),
+                file: htmlentities((string) $frame->getFile()),
+                tags: $this->renderTags($frame, $tagCallback),
+                preview: $this->renderPreview(
+                    new FilePreview($frame->getFile()),
+                    $previewCallback,
+                    $lineCallback
+                ),
+            ),
+            $this->backtrace->frames()
+        );
+
+        return $framesCallback(implode(PHP_EOL, $frames));
     }
 
     private function renderTags(Frame $frame, callable $tagCallback): string

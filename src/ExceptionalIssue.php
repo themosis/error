@@ -59,4 +59,22 @@ final class ExceptionalIssue implements Issue
     {
         return $this->exception;
     }
+
+    public function stack(): array
+    {
+        $issues = [];
+
+        return $this->getIssueFromException($this->exception, $issues);
+    }
+
+    private function getIssueFromException(Throwable $exception, array &$issues): array
+    {
+        $issues[] = self::create($exception);
+
+        if ($previous = $exception->getPrevious()) {
+            return $this->getIssueFromException($previous, $issues);
+        }
+
+        return $issues;
+    }
 }
