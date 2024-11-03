@@ -43,6 +43,8 @@ final class ExceptionHandlerHttpResponse
             return require $path;
         };
 
+        $this->information->add($issue->info());
+
         $exception = $issue->exception();
 
         $content(

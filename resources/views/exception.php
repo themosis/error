@@ -512,7 +512,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <div class="wrapper">
                 <section id="issue" class="section">
                     <div id="exception">
-                        <h2 class="section-title"><?= $exception_class ?></h2>
+                        <h2 class="section-title"><?= $exceptionClass ?></h2>
                         <p class="message"><?= $message ?></p>
                         <p class="file"><?= $file ?></p>
                         <?= $preview(

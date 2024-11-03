@@ -20,7 +20,7 @@ final class ExceptionHandler
     public function __invoke(Throwable $exception)
     {
         $this->reportHandler
-            ->capture(Issue::fromException($exception))
+            ->capture(ExceptionalIssue::create($exception))
             ->publish();
     }
 }
