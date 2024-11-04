@@ -1,7 +1,10 @@
 <?php
 
 use Themosis\Components\Error\AdditionalInformation;
+use Themosis\Components\Error\Backtrace\AppFrameTag;
 use Themosis\Components\Error\Backtrace\Backtrace;
+use Themosis\Components\Error\Backtrace\CustomFrameIdentifier;
+use Themosis\Components\Error\Backtrace\Frame;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\ErrorHandler;
 use Themosis\Components\Error\ExceptionHandler;
@@ -35,8 +38,16 @@ $reporters = new InMemoryReporters();
 $reporters->add(
     condition: new AlwaysReport(),
     reporter: new CallbackReporter(static function (Issue $issue) {
+        $identifiers = new InMemoryFrameIdentifiers();
+        $identifiers->add(new CustomFrameIdentifier(
+            tag: new AppFrameTag(),
+            identifier: static function (Frame $frame) {
+                return str_contains($frame->getFile()->path(), 'nested-error');
+            },
+        ));
+
         $backtrace  = new Backtrace(
-            frameIdentifiers: new InMemoryFrameIdentifiers(),
+            frameIdentifiers: $identifiers,
         );
 
         (new ExceptionHandlerHttpResponse(

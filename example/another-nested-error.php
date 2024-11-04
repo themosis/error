@@ -9,7 +9,7 @@ class ServiceException extends Exception implements AdditionalInformation
     public function information(): InformationGroup
     {
         $info = new InformationGroup(
-            name: 'The Payment Provider',
+            name: 'Card IO',
         );
 
         $info->add(new TextInfo('Transaction #', 'PAY-965653'));

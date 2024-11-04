@@ -30,12 +30,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
             --color-blue-800: rgb(24, 78, 116);
             --color-blue-900: rgb(38, 49, 68);
 
-            --color-red-100: rgb(255, 240, 235);
-            --color-red-200: rgb(250, 224, 212);
-            --color-red-300: rgb(255, 235, 240);
-            --color-red-700: rgb(125, 30, 10);
-            --color-red-800: rgb(90, 40, 55);
-            --color-red-900: rgb(70, 30, 55);
+            --color-red-100: hsl(15, 100%, 96%);
+            --color-red-200: hsl(19, 79%, 91%);
+            --color-red-300: hsl(345, 100%, 96%);
+            --color-red-700: hsl(10, 85%, 26%);
+            --color-red-800: hsl(342, 38%, 25%);
+            --color-red-900: hsl(323, 36%, 20%);
 
             --color-yellow-500: rgb(255, 226, 115);
 
@@ -150,7 +150,25 @@ SPDX-License-Identifier: GPL-3.0-or-later
         }
 
         #issue .section {
-            --section-bg: linear-gradient(to bottom right, var(--color-red-100) 30%, var(--color-red-300));
+            --_gradient-1: hsl(15, var(--gradient-1-saturation, 100%), 96%);
+            --_gradient-2: hsl(345, var(--gradient-2-saturation, 100%), 96%);
+
+            --section-bg: linear-gradient(to bottom right, var(--_gradient-1) 30%, var(--_gradient-2));
+        }
+
+        #issue .section:nth-of-type(2) {
+            --gradient-1-saturation: 80%;
+            --gradient-2-saturation: 80%;
+        }
+        
+        #issue .section:nth-of-type(3) {
+            --gradient-1-saturation: 60%;
+            --gradient-2-saturation: 60%;
+        }
+        
+        #issue .section:nth-of-type(4) {
+            --gradient-1-saturation: 40%;
+            --gradient-2-saturation: 40%;
         }
 
         .section-title {
@@ -406,9 +424,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 --body-bg: var(--color-gray-900);
                 --section-bg: var(--color-gray-800);
             }
-
+            
             #issue .section {
-                --section-bg: linear-gradient(to bottom right, var(--color-red-800) 30%, var(--color-red-900));
+                --_gradient-1: hsl(342, var(--gradient-1-saturation, 38%), 25%);
+                --_gradient-2: hsl(323, var(--gradient-2-saturation, 36%), 20%);
+
+                --section-bg: linear-gradient(to bottom right, var(--_gradient-1) 30%, var(--_gradient-2));
+            }
+
+            #issue .section:nth-of-type(2) {
+                --gradient-1-saturation: 28%;
+                --gradient-2-saturation: 26%;
+            }
+            
+            #issue .section:nth-of-type(3) {
+                --gradient-1-saturation: 18%;
+                --gradient-2-saturation: 16%;
+            }
+            
+            #issue .section:nth-of-type(4) {
+                --gradient-1-saturation: 8%;
+                --gradient-2-saturation: 6%;
             }
 
             .section:target {
