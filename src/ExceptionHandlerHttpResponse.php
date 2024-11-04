@@ -201,6 +201,10 @@ final class ExceptionHandlerHttpResponse
             $file->getLines(),
         );
 
+        if (empty($lines)) {
+            return '';
+        }
+
         return $previewCallback(implode(PHP_EOL, $lines));
     }
 }
