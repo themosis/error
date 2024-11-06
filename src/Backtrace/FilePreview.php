@@ -44,23 +44,7 @@ final class FilePreview
             return $this->lines;
         }
 
-        $adjustRange = function (int $initialRange) {
-            $lineNumber = $this->file->line();
-            $topRange = $initialRange;
-            $bottomRange = $initialRange;
-
-            if (( $lineNumber - $initialRange ) < 1) {
-                $topRange = $lineNumber - 1;
-            }
-
-            if (( $lineNumber + $initialRange ) > $this->totalRows) {
-                $bottomRange = $this->totalRows - $lineNumber;
-            }
-
-            return min($topRange, $bottomRange, $initialRange);
-        };
-
-        $range = $adjustRange($range);
+        $range = $this->adjustRange($range);
         $startRow = $this->file->line() - $range;
         $endRow = $this->file->line() + $range;
 
@@ -78,6 +62,23 @@ final class FilePreview
         }
 
         return $this->lines;
+    }
+
+    private function adjustRange(int $initialRange): int
+    {
+        $lineNumber = $this->file->line();
+        $topRange = $initialRange;
+        $bottomRange = $initialRange;
+
+        if (( $lineNumber - $initialRange ) < 1) {
+            $topRange = $lineNumber - 1;
+        }
+
+        if (( $lineNumber + $initialRange ) > $this->totalRows) {
+            $bottomRange = $this->totalRows - $lineNumber;
+        }
+
+        return min($topRange, $bottomRange, $initialRange);
     }
 
     public function rowNumberLength(): int

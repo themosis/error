@@ -12,20 +12,15 @@ use Stringable;
 
 final class File implements Stringable
 {
-    private ?string $filepath;
-    private int $line;
-
     public function __construct(
-        ?string $filepath,
-        ?int $line,
+        private string $filepath,
+        private int $line,
     ) {
-        $this->filepath = $filepath;
-        $this->line = $line ?? 1;
     }
 
     public function path(): string
     {
-        return $this->filepath ?? '';
+        return $this->filepath;
     }
 
     public function line(): int
@@ -35,10 +30,6 @@ final class File implements Stringable
 
     public function __toString(): string
     {
-        if (null === $this->filepath) {
-            return '';
-        }
-
         return sprintf('%s:%d', $this->filepath, $this->line);
     }
 }

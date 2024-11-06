@@ -15,6 +15,11 @@ final class PhpFunction implements FrameFunction
     ) {
     }
 
+    public function getName(): string
+    {
+        return $this->functionName;
+    }
+
     public function __toString(): string
     {
         return sprintf('%s()', $this->functionName);

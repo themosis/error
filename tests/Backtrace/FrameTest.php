@@ -33,6 +33,12 @@ final class FrameTest extends TestCase
         foreach ($frame as $key => $value) {
             $this->assertSame($data[ $key ], $value);
         }
+
+        $this->assertSame($data['file'], $frame->getFile()?->path());
+        $this->assertSame($data['line'], $frame->getFile()?->line());
+        $this->assertSame($data['function'], $frame->getFunction()->getName());
+        $this->assertEmpty($frame->getArgs());
+        $this->assertNull($frame->getObject());
     }
 
     #[Test]
@@ -63,6 +69,20 @@ final class FrameTest extends TestCase
             '/disk/web/project/app/config.php:11 include()',
             (string) $frame,
         );
+
+        $this->assertSame($data['function'], $frame->getFunction()->getName());
+    }
+
+    #[Test]
+    public function it_can_generate_a_backtrace_frame_for_invalid_php_function_usage(): void
+    {
+        $data = FramesProvider::phpFunctionInvalidArguments();
+
+        $frame = new Frame($data);
+
+        $this->assertSame($data['function'], $frame->getFunction()->getName());
+        $this->assertCount(1, $frame->getArgs());
+        $this->assertSame(42, $frame->getArgs()[0]);
     }
 
     #[Test]
@@ -94,6 +114,31 @@ final class FrameTest extends TestCase
         );
 
         $this->assertCount(3, $frame->tags());
+    }
+
+    #[Test]
+    public function it_can_create_invoke_magic_method_frame(): void
+    {
+        $data = FramesProvider::invokeMagicMethod();
+
+        $frame = new Frame($data);
+
+        $this->assertSame('SomeVendor\AwesomePackage\Handler->__invoke()', (string) $frame);
+        $this->assertNull($frame->getFile());
+        $this->assertSame($data['function'], $frame->getFunction()->getName());
+    }
+
+    #[Test]
+    public function it_can_create_frame_with_object_instance_error(): void
+    {
+        $data = FramesProvider::objectError();
+
+        $frame = new Frame($data);
+
+        $obj = $frame->getObject();
+
+        $this->assertTrue(is_object($obj));
+        $this->assertTrue(method_exists($obj, 'checkout'));
     }
 
     #[Test]
@@ -159,5 +204,25 @@ final class FrameTest extends TestCase
         );
 
         $this->assertTrue($identifier->identify($frame));
+    }
+
+    #[Test]
+    public function it_can_not_identify_a_frame_as_vendor_if_no_file_or_vendor_path(): void
+    {
+        $data = FramesProvider::invokeMagicMethod();
+
+        $frame = new Frame($data);
+
+        $identifier = new VendorFrameIdentifier(
+            projectRootPath: '/disk/web/project',
+        );
+
+        $this->assertFalse($identifier->identify($frame));
+
+        $data = FramesProvider::fileWithInclude();
+
+        $frame = new Frame($data);
+
+        $this->assertFalse($identifier->identify($frame));
     }
 }

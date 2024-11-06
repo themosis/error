@@ -22,6 +22,11 @@ final class ClassFunction implements FrameClassFunction
         return $this->className;
     }
 
+    public function getName(): string
+    {
+        return $this->functionName;
+    }
+
     public function __toString(): string
     {
         return sprintf('%s%s%s()', $this->className, $this->type, $this->functionName);

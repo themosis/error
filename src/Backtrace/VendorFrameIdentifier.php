@@ -23,7 +23,7 @@ final class VendorFrameIdentifier implements FrameIdentifier
 
     public function identify(Frame $frame): bool
     {
-        $path = $frame->getFile()->path();
+        $path = $frame->getFile()?->path();
 
         if (empty($path)) {
             return false;

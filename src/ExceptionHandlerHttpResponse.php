@@ -79,11 +79,9 @@ final class ExceptionHandlerHttpResponse
                                 message: $stackIssue->message(),
                                 file: sprintf('%s:%s', $exception->getFile(), $exception->getLine()),
                                 preview: $this->renderPreview(
-                                    file: new FilePreview(
-                                        file: new File(
-                                            filepath: $exception->getFile(),
-                                            line: $exception->getLine(),
-                                        ),
+                                    file: new File(
+                                        filepath: $exception->getFile(),
+                                        line: $exception->getLine(),
                                     ),
                                     previewCallback: $previewCallback,
                                     lineCallback: $lineCallback,
@@ -168,10 +166,10 @@ final class ExceptionHandlerHttpResponse
         $frames = array_map(
             fn (Frame $frame) => $frameCallback(
                 function: htmlentities((string) $frame->getFunction()),
-                file: htmlentities((string) $frame->getFile()),
+                file: htmlentities((string) ($frame->getFile() ?: $frame->getFunction()->getName().'()')),
                 tags: $this->renderTags($frame, $tagCallback),
                 preview: $this->renderPreview(
-                    new FilePreview($frame->getFile()),
+                    $frame->getFile(),
                     $previewCallback,
                     $lineCallback
                 ),
@@ -189,16 +187,22 @@ final class ExceptionHandlerHttpResponse
         return implode(PHP_EOL, $tags);
     }
 
-    private function renderPreview(FilePreview $file, callable $previewCallback, callable $lineCallback): string
+    private function renderPreview(?File $file, callable $previewCallback, callable $lineCallback): string
     {
+        if (! $file) {
+            return '';
+        }
+
+        $preview = new FilePreview($file);
+
         $lines = array_map(
             static fn (FilePreviewLine $line) => $lineCallback(
-                className: $file->isCurrentLine($line->number()) ? 'current-line' : '',
-                length: $file->rowNumberLength(),
+                className: $preview->isCurrentLine($line->number()) ? 'current-line' : '',
+                length: $preview->rowNumberLength(),
                 number: $line->number(),
                 line: $line->content(),
             ),
-            $file->getLines(),
+            $preview->getLines(),
         );
 
         if (empty($lines)) {

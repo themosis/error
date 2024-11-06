@@ -17,6 +17,7 @@ use Themosis\Components\Error\Backtrace\FrameClassFunction;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\Backtrace\VendorFrameIdentifier;
 use Themosis\Components\Error\Backtrace\VendorFrameTag;
+use Themosis\Components\Error\Exceptions\DuplicateFrameIdentifier;
 use Themosis\Components\Error\Tests\TestCase;
 
 final class BacktraceTest extends TestCase
@@ -66,6 +67,23 @@ final class BacktraceTest extends TestCase
 
         $this->assertNotSame($backtrace, $filteredBacktrace);
         $this->assertCount(1, $filteredBacktrace->frames());
+    }
+
+    #[Test]
+    public function it_can_not_use_identifiers_with_identical_names(): void
+    {
+        $identifiers = new InMemoryFrameIdentifiers();
+
+        $identifiers->add(new VendorFrameIdentifier(dirname(__DIR__, 2)));
+
+        $this->expectException(DuplicateFrameIdentifier::class);
+
+        $identifiers->add(new CustomFrameIdentifier(
+            tag: new CustomFrameTag('vendor', 'Another Vendor'),
+            identifier: function (Frame $frame) {
+                return $frame->getFunction() === 'callme';
+            }
+        ));
     }
 
     #[Test]

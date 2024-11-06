@@ -17,8 +17,8 @@ final class Frame implements Stringable, IteratorAggregate
 {
     private array $rawFrame;
     private FrameFunction $function;
-    private File $file;
-    private ?object $object;
+    private ?File $file = null;
+    private ?object $object = null;
     private array $args;
 
     /**
@@ -30,10 +30,12 @@ final class Frame implements Stringable, IteratorAggregate
     {
         $this->rawFrame = $frame;
 
-        $this->file = new File(
-            filepath: $frame['file'] ?? null,
-            line: $frame['line'] ?? null,
-        );
+        if (isset($frame['file']) && isset($frame['line'])) {
+            $this->file = new File(
+                filepath: $frame['file'],
+                line: $frame['line'],
+            );
+        } 
 
         $this->function = isset($frame['class'])
             ? new ClassFunction(
@@ -76,7 +78,7 @@ final class Frame implements Stringable, IteratorAggregate
         return $this->function;
     }
 
-    public function getFile(): File
+    public function getFile(): ?File
     {
         return $this->file;
     }
@@ -103,6 +105,6 @@ final class Frame implements Stringable, IteratorAggregate
             $this->function,
         ];
 
-        return implode(' ', $elements);
+        return implode(' ', array_filter($elements));
     }
 }

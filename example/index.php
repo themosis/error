@@ -42,7 +42,7 @@ $reporters->add(
         $identifiers->add(new CustomFrameIdentifier(
             tag: new AppFrameTag(),
             identifier: static function (Frame $frame) {
-                return str_contains($frame->getFile()->path(), 'nested-error');
+                return str_contains($frame->getFile()?->path() ?? '', 'nested-error');
             },
         ));
 

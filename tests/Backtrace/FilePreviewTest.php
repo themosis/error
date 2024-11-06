@@ -26,6 +26,9 @@ final class FilePreviewTest extends TestCase
         );
 
         $this->assertCount(5, $preview->getLines());
+        $this->assertTrue($preview->isCurrentLine(3));
+        $this->assertFalse($preview->isCurrentLine(25));
+        $this->assertSame(1, $preview->rowNumberLength());
     }
 
     #[Test]
@@ -41,5 +44,6 @@ final class FilePreviewTest extends TestCase
         );
 
         $this->assertCount(7, $preview->getLines());
+        $this->assertSame(2, $preview->rowNumberLength());
     }
 }

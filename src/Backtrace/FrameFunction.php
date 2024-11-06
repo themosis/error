@@ -12,4 +12,5 @@ use Stringable;
 
 interface FrameFunction extends Stringable
 {
+    public function getName(): string;
 }
