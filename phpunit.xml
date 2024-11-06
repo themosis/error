@@ -28,4 +28,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <directory>src</directory>
         </include>
     </source>
+
+    <coverage includeUncoveredFiles="true">
+        <report>
+            <html outputDirectory="coverage/html" highLowerBound="100"/>
+        </report>
+    </coverage>
 </phpunit>
