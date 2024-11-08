@@ -29,6 +29,8 @@ final class LogReporter implements Reporter
                 $issue->info()?->getInformation() ?? [],
                 static function (array $carry, Info $info) {
                     $carry[ $info->name() ] = $info->value();
+
+                    return $carry;
                 },
                 []
             ),

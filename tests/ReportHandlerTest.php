@@ -130,7 +130,7 @@ final class ReportHandlerTest extends TestCase
         $issues = new InMemoryIssues();
         $issues->add(
             issue: ExceptionalIssue::create(
-                exception: new Exception('Something went wrong!'),
+                exception: new FakeException('Something went wrong!'),
                 occuredAt: new DateTimeImmutable('now'),
             ),
         );
@@ -145,7 +145,14 @@ final class ReportHandlerTest extends TestCase
         $this->assertTrue(file_exists($path));
         $this->assertNotEmpty(file_get_contents($path));
 
-        unlink($path);
+        $logContent = file_get_contents($path);
+
+        $this->assertTrue(str_contains($logContent, 'Order ID'));
+        $this->assertTrue(str_contains($logContent, 'ORD-1234'));
+        $this->assertTrue(str_contains($logContent, 'Customer ID'));
+        $this->assertTrue(str_contains($logContent, 'USR-1234'));
+
+        file_put_contents($path, '');
     }
 
     #[Test]
