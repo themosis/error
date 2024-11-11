@@ -128,4 +128,37 @@ final class ErrorHandlerTest extends TestCase
         $this->assertSame('User Deprecated Error', $stdout);
         $this->assertSame('User Deprecated Error', $fakeLogMessage);
     }
+
+    #[Test]
+    public function it_can_be_ignored_if_current_reporting_is_disabled_on_user_notice(): void
+    {
+        $message = '';
+
+        $reporters = new InMemoryReporters();
+
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new CallbackReporter(function (Issue $issue) use (&$message) {
+                $message = $issue->message();
+            }),
+        );
+
+        $errorHandler = new ErrorHandler(
+            reportHandler: new ReportHandler(
+                reporters: $reporters,
+                issues: new InMemoryIssues(),
+            ),
+        );
+
+        error_reporting(0);
+
+        set_error_handler($errorHandler);
+
+        ob_start();
+            trigger_error('User error', E_USER_NOTICE);
+        $stdout = ob_get_clean();
+
+        $this->assertEmpty($message);
+        $this->assertEmpty($stdout);
+    }
 }
