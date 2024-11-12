@@ -38,6 +38,9 @@ final class Backtrace implements Stringable
         );
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $frames
+     */
     public function capture(array $frames): self
     {
         $this->frames = array_map($this->makeFrame(...), $frames);
@@ -52,6 +55,9 @@ final class Backtrace implements Stringable
         );
     }
 
+    /**
+     * @return array<int, Frame>
+     */
     public function frames(): array
     {
         return $this->frames;
@@ -73,6 +79,9 @@ final class Backtrace implements Stringable
         return $filteredBacktrace;
     }
 
+    /**
+     * @param array<string, mixed> $frameArgs
+     */
     private function makeFrame(array $frameArgs): Frame
     {
         $frame = new Frame($frameArgs);
