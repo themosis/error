@@ -10,7 +10,7 @@ namespace Themosis\Components\Error;
 
 interface Information
 {
-    public function add(?InformationGroup $info): void;
+    public function add(InformationGroup $info): void;
 
     public function getInformationByPriority(): array;
 }

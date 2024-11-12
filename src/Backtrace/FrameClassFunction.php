@@ -10,5 +10,5 @@ namespace Themosis\Components\Error\Backtrace;
 
 interface FrameClassFunction extends FrameFunction
 {
-    public function getClass(): string;    
+    public function getClass(): string;
 }

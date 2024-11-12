@@ -35,7 +35,7 @@ final class Frame implements Stringable, IteratorAggregate
                 filepath: $frame['file'],
                 line: $frame['line'],
             );
-        } 
+        }
 
         $this->function = isset($frame['class'])
             ? new ClassFunction(

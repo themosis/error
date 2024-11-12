@@ -16,7 +16,7 @@ use Themosis\Components\Error\Backtrace\FilePreviewLine;
 use Themosis\Components\Error\Backtrace\Frame;
 use Themosis\Components\Error\Backtrace\FrameTag;
 
-final class ExceptionHandlerHttpResponse
+final class ExceptionHandlerHtmlResponse
 {
     private string $viewPath;
 
@@ -27,25 +27,20 @@ final class ExceptionHandlerHttpResponse
         $this->viewPath = realpath(__DIR__ . '/../resources/views/exception.php');
     }
 
-    public function withView(string $viewPath): static
-    {
-        $this->viewPath = $viewPath;
-
-        return $this;
-    }
-
-    public function render(Issue $issue): void
+    public function send(Issue $issue): void
     {
         $content = static function (string $path, array $data = []) {
             // phpcs:ignore
-			extract($data);
+            extract($data);
 
             return require $path;
         };
 
         $prepareInformation = function (array $stack): void {
             array_map(function (Issue $issue): void {
-                $this->information->add($issue->info());
+                if ($info = $issue->info()) {
+                    $this->information->add($info);
+                }
             }, $stack);
         };
 
@@ -140,7 +135,7 @@ final class ExceptionHandlerHttpResponse
 
                             return $carry;
                         },
-                        [ $navigationCallback(id: 'issue', title: 'Issue') ]
+                        [$navigationCallback(id: 'issue', title: 'Issue')]
                     );
 
                     return implode(PHP_EOL, $items);
@@ -159,21 +154,25 @@ final class ExceptionHandlerHttpResponse
     ): string {
         $this->backtrace->captureException($issue->exception());
 
-        if (empty($this->backtrace->frames())) {
-            return '';
-        }
-
         $frames = array_map(
-            fn (Frame $frame) => $frameCallback(
-                function: htmlentities((string) $frame->getFunction()),
-                file: htmlentities((string) ($frame->getFile() ?: $frame->getFunction()->getName().'()')),
-                tags: $this->renderTags($frame, $tagCallback),
-                preview: $this->renderPreview(
-                    $frame->getFile(),
-                    $previewCallback,
-                    $lineCallback
-                ),
-            ),
+            function (Frame $frame) use ($frameCallback, $tagCallback, $previewCallback, $lineCallback) {
+                $preview = '';
+
+                if ($file = $frame->getFile()) {
+                    $preview = $this->renderPreview(
+                        $file,
+                        $previewCallback,
+                        $lineCallback,
+                    );
+                }
+
+                return $frameCallback(
+                    function: htmlentities((string) $frame->getFunction()),
+                    file: htmlentities((string) ($frame->getFile() ?: $frame->getFunction()->getName() . '()')),
+                    tags: $this->renderTags($frame, $tagCallback),
+                    preview: $preview,
+                );
+            },
             $this->backtrace->frames()
         );
 
@@ -182,21 +181,17 @@ final class ExceptionHandlerHttpResponse
 
     private function renderTags(Frame $frame, callable $tagCallback): string
     {
-        $tags = array_map(static fn (FrameTag $tag) => $tagCallback(htmlentities($tag->name())), $frame->tags());
+        $tags = array_map(static fn(FrameTag $tag) => $tagCallback(htmlentities($tag->name())), $frame->tags());
 
         return implode(PHP_EOL, $tags);
     }
 
-    private function renderPreview(?File $file, callable $previewCallback, callable $lineCallback): string
+    private function renderPreview(File $file, callable $previewCallback, callable $lineCallback): string
     {
-        if (! $file) {
-            return '';
-        }
-
         $preview = new FilePreview($file);
 
         $lines = array_map(
-            static fn (FilePreviewLine $line) => $lineCallback(
+            static fn(FilePreviewLine $line) => $lineCallback(
                 className: $preview->isCurrentLine($line->number()) ? 'current-line' : '',
                 length: $preview->rowNumberLength(),
                 number: $line->number(),
@@ -204,10 +199,6 @@ final class ExceptionHandlerHttpResponse
             ),
             $preview->getLines(),
         );
-
-        if (empty($lines)) {
-            return '';
-        }
 
         return $previewCallback(implode(PHP_EOL, $lines));
     }

@@ -68,12 +68,19 @@ final class FramesProvider
 
     public static function objectError(): array
     {
+        $object = new class ()
+        {
+            public function checkout()
+            {
+            }
+        };
+
         return [
             'file'     => '/disk/web/project/module/orders/Order.php',
             'line'     => 113,
             'function' => 'checkout',
             'class'    => 'App\Module\Orders\Order',
-            'object'   => new class() { public function checkout() {} },
+            'object'   => $object,
             'type'     => '->',
         ];
     }

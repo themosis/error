@@ -8,7 +8,7 @@ use Themosis\Components\Error\Backtrace\Frame;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
 use Themosis\Components\Error\ErrorHandler;
 use Themosis\Components\Error\ExceptionHandler;
-use Themosis\Components\Error\ExceptionHandlerHttpResponse;
+use Themosis\Components\Error\ExceptionHandlerHtmlResponse;
 use Themosis\Components\Error\InformationGroup;
 use Themosis\Components\Error\InMemoryInformation;
 use Themosis\Components\Error\InMemoryIssues;
@@ -50,10 +50,10 @@ $reporters->add(
             frameIdentifiers: $identifiers,
         );
 
-        (new ExceptionHandlerHttpResponse(
+        (new ExceptionHandlerHtmlResponse(
             backtrace: $backtrace,
             information: new InMemoryInformation(),
-        ))->render($issue);
+        ))->send($issue);
     }),
 );
 
