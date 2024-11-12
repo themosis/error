@@ -115,7 +115,7 @@ final class Backtrace implements Stringable
         );
     }
 
-    public function __debugInfo()
+    public function __debugInfo(): array
     {
         return array_map(
             function (Frame $frame) {

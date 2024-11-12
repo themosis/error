@@ -81,7 +81,7 @@ final class BacktraceTest extends TestCase
         $identifiers->add(new CustomFrameIdentifier(
             tag: new CustomFrameTag('vendor', 'Another Vendor'),
             identifier: function (Frame $frame) {
-                return $frame->getFunction() === 'callme';
+                return $frame->getFunction() == 'callme';
             }
         ));
     }
