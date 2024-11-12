@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2024 Julien Lambé <julien@themosis.com>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 use Themosis\Components\Error\AdditionalInformation;
 use Themosis\Components\Error\InformationGroup;
 use Themosis\Components\Error\TextInfo;

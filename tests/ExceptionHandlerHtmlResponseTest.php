@@ -1,9 +1,14 @@
 <?php
 
+// SPDX-FileCopyrightText: 2024 Julien Lambé <julien@themosis.com>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 declare(strict_types=1);
 
 namespace Themosis\Components\Error\Tests;
 
+use Exception;
 use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use Themosis\Components\Error\Backtrace\Backtrace;
@@ -69,5 +74,36 @@ final class ExceptionHandlerHtmlResponseTest extends TestCase
         $this->assertTrue(str_contains($stdout, '1.0.5'));
         $this->assertTrue(str_contains($stdout, 'Environment'));
         $this->assertTrue(str_contains($stdout, 'staging'));
+    }
+
+    #[Test]
+    public function it_can_render_exception_with_their_ancestors(): void
+    {
+        $backtrace = new Backtrace(
+            frameIdentifiers: new InMemoryFrameIdentifiers(),
+        );
+
+        $response = new ExceptionHandlerHtmlResponse(
+            backtrace: $backtrace,
+            information: new InMemoryInformation(),
+        );
+
+        $stdout = '';
+
+        try {
+            throw new RuntimeException('First exception');
+        } catch (RuntimeException $firstException) {
+            $secondException = new Exception('Second exception', previous: $firstException);
+
+            $issue = ExceptionalIssue::create($secondException);
+
+            ob_start();
+                $response->send($issue);
+            ;
+            $stdout = ob_get_clean();
+        }
+
+        $this->assertTrue(str_contains($stdout, 'First exception'));
+        $this->assertTrue(str_contains($stdout, 'Second exception'));
     }
 }

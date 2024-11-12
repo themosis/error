@@ -151,6 +151,45 @@ final class ReportHandlerTest extends TestCase
         $this->assertTrue(str_contains($logContent, 'ORD-1234'));
         $this->assertTrue(str_contains($logContent, 'Customer ID'));
         $this->assertTrue(str_contains($logContent, 'USR-1234'));
+        $this->assertTrue(str_contains($logContent, 'ERROR'));
+
+        file_put_contents($path, '');
+    }
+
+    #[Test]
+    public function it_can_report_an_issue_with_custom_error_level_to_local_log_file(): void
+    {
+        $logger = new Logger('APP');
+        $logger->pushHandler(new StreamHandler(stream: $path = __DIR__ . '/test.log'));
+
+        $reporters = new InMemoryReporters();
+        $reporters->add(
+            condition: new AlwaysReport(),
+            reporter: new LogReporter($logger)
+        );
+
+        $issues = new InMemoryIssues();
+        $issues->add(
+            issue: ExceptionalIssue::create(
+                exception: new FakeNoticeException('A gentle notice'),
+                occuredAt: new DateTimeImmutable('now'),
+            ),
+        );
+
+        $handler = new ReportHandler(
+            reporters: $reporters,
+            issues: $issues,
+        );
+
+        $handler->publish();
+
+        $this->assertTrue(file_exists($path));
+        $this->assertNotEmpty(file_get_contents($path));
+
+        $logContent = file_get_contents($path);
+
+        $this->assertTrue(str_contains($logContent, 'A gentle notice'));
+        $this->assertTrue(str_contains($logContent, 'NOTICE'));
 
         file_put_contents($path, '');
     }
