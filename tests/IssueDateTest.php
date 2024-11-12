@@ -26,7 +26,7 @@ final class IssueDateTest extends TestCase
             ),
         );
 
-        $this->assertSame('2024-07-10T13:42:18+02:00', $date->toString());
+        $this->assertSame('2024-07-10T13:42:18+02:00', (string) $date);
     }
 
     #[Test]
@@ -40,6 +40,6 @@ final class IssueDateTest extends TestCase
             ),
         ) )->withFormat('Y/m/d');
 
-        $this->assertSame('2024/07/10', $date->toString());
+        $this->assertSame('2024/07/10', (string) $date);
     }
 }

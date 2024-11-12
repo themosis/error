@@ -27,13 +27,8 @@ final class IssueDate implements Stringable
         return $this;
     }
 
-    public function toString(): string
-    {
-        return $this->datetime->format($this->format);
-    }
-
     public function __toString(): string
     {
-        return $this->toString();
+        return $this->datetime->format($this->format);
     }
 }
