@@ -15,7 +15,7 @@ jobs:
     
     strategy:
       matrix:
-        php-version: ['8.2.x', '8.3.x']
+        php-version: ['8.2', '8.3']
         
     steps:
     - uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: none, ctype, curl, dom, json, libxml, mbstring, openssl, phar, tokenizer, xml, xmlwriter
-        coverage: none
+        coverage: xdebug
         tools: none
 
     - name: Validate composer.json and composer.lock
