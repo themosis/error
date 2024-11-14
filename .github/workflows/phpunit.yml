@@ -1,4 +1,5 @@
 name: PHPUnit
+
 on:
   push:
     branches: [ "main" ]
@@ -11,9 +12,21 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
+    strategy:
+      matrix:
+        php-version: ['8.2.x', '8.3.x']
+        
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: none, ctype, curl, dom, json, libxml, mbstring, openssl, phar, tokenizer, xml, xmlwriter
+        coverage: none
+        tools: none
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
@@ -22,6 +35,7 @@ jobs:
       id: composer-cache
       uses: actions/cache@v3
       with:
+        php-version: ${{ matrix.php-versions }}
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
