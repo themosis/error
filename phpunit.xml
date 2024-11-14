@@ -17,7 +17,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </source>
   <coverage>
     <report>
-      <html outputDirectory="coverage/html" highLowerBound="100"/>
+      <html highLowerBound="100"/>
     </report>
   </coverage>
 </phpunit>
