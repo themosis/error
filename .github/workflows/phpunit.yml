@@ -23,7 +23,7 @@ jobs:
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php-versions }}
+        php-version: ${{ matrix.php-version }}
         extensions: none, ctype, curl, dom, json, libxml, mbstring, openssl, phar, tokenizer, xml, xmlwriter
         coverage: xdebug
         tools: none
@@ -35,7 +35,7 @@ jobs:
       id: composer-cache
       uses: actions/cache@v3
       with:
-        php-version: ${{ matrix.php-versions }}
+        php-version: ${{ matrix.php-version }}
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
