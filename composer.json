@@ -10,7 +10,7 @@
         }
     ],
     "prefer-stable": true,
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "Themosis\\Components\\Error\\": "src/"
@@ -26,11 +26,8 @@
         "php": "^8.2",
         "psr/log": "^3.0"
     },
-    "require-dev": {
-        "phpunit/phpunit": "^11.1"
-    },
     "scripts": {
-        "test": "XDEBUG_MODE=coverage phpunit --coverage-html coverage/html",
+        "test": "XDEBUG_MODE=coverage tools/phpunit/vendor/bin/phpunit --coverage-html coverage/html",
         "fix": "tools/phpcs/vendor/bin/phpcbf",
         "sniff": "tools/phpcs/vendor/bin/phpcs",
         "analyze": "tools/phpstan/vendor/bin/phpstan analyze"
