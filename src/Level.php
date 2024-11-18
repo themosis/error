@@ -15,7 +15,7 @@ enum Level: string
     case Critical  = 'critical';
     case Error     = 'error';
     case Warning   = 'warning';
-    case Notice    = 'Notice';
+    case Notice    = 'notice';
     case Info      = 'info';
     case Debug     = 'debug';
 }

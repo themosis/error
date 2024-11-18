@@ -10,8 +10,6 @@ namespace Themosis\Components\Error\Tests;
 
 use DateTimeImmutable;
 use Exception;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use PHPUnit\Framework\Attributes\Test;
 use Themosis\Components\Error\Backtrace\Backtrace;
 use Themosis\Components\Error\Backtrace\InMemoryFrameIdentifiers;
@@ -112,14 +110,14 @@ final class ReportHandlerTest extends TestCase
             (string) $backtrace
         );
 
-        $this->assertSame(implode('', [ $expected, $expected, $expected ]), $stdout);
+        $this->assertSame(implode('', [$expected, $expected, $expected]), $stdout);
     }
 
     #[Test]
-    public function it_can_report_an_issue_to_local_log_file(): void
+    public function it_can_report_an_issue_to_local_log_file_on_error_level(): void
     {
-        $logger = new Logger('APP');
-        $logger->pushHandler(new StreamHandler(stream: $path = __DIR__ . '/test.log'));
+        $log = [];
+        $logger = new FakePsrLogger($log);
 
         $reporters = new InMemoryReporters();
         $reporters->add(
@@ -130,7 +128,7 @@ final class ReportHandlerTest extends TestCase
         $issues = new InMemoryIssues();
         $issues->add(
             issue: ExceptionalIssue::create(
-                exception: new FakeException('Something went wrong!'),
+                exception: $exception = new FakeException('Something went wrong!'),
                 occuredAt: new DateTimeImmutable('now'),
             ),
         );
@@ -142,25 +140,21 @@ final class ReportHandlerTest extends TestCase
 
         $handler->publish();
 
-        $this->assertTrue(file_exists($path));
-        $this->assertNotEmpty(file_get_contents($path));
-
-        $logContent = file_get_contents($path);
-
-        $this->assertTrue(str_contains($logContent, 'Order ID'));
-        $this->assertTrue(str_contains($logContent, 'ORD-1234'));
-        $this->assertTrue(str_contains($logContent, 'Customer ID'));
-        $this->assertTrue(str_contains($logContent, 'USR-1234'));
-        $this->assertTrue(str_contains($logContent, 'ERROR'));
-
-        file_put_contents($path, '');
+        $this->assertCount(1, $log);
+        $this->assertSame([
+            [
+                'level' => 'error',
+                'message' => $exception->getMessage(),
+                'context' => $exception->information()->toArray(),
+            ]
+        ], $log);
     }
 
     #[Test]
     public function it_can_report_an_issue_with_custom_error_level_to_local_log_file(): void
     {
-        $logger = new Logger('APP');
-        $logger->pushHandler(new StreamHandler(stream: $path = __DIR__ . '/test.log'));
+        $log = [];
+        $logger = new FakePsrLogger($log);
 
         $reporters = new InMemoryReporters();
         $reporters->add(
@@ -171,7 +165,7 @@ final class ReportHandlerTest extends TestCase
         $issues = new InMemoryIssues();
         $issues->add(
             issue: ExceptionalIssue::create(
-                exception: new FakeNoticeException('A gentle notice'),
+                exception: $exception = new FakeNoticeException('A gentle notice'),
                 occuredAt: new DateTimeImmutable('now'),
             ),
         );
@@ -183,15 +177,14 @@ final class ReportHandlerTest extends TestCase
 
         $handler->publish();
 
-        $this->assertTrue(file_exists($path));
-        $this->assertNotEmpty(file_get_contents($path));
-
-        $logContent = file_get_contents($path);
-
-        $this->assertTrue(str_contains($logContent, 'A gentle notice'));
-        $this->assertTrue(str_contains($logContent, 'NOTICE'));
-
-        file_put_contents($path, '');
+        $this->assertCount(1, $log);
+        $this->assertSame([
+            [
+                'level' => 'notice',
+                'message' => $exception->getMessage(),
+                'context' => [],
+            ]
+        ], $log);
     }
 
     #[Test]
@@ -243,7 +236,7 @@ final class ReportHandlerTest extends TestCase
             (string) $backtrace
         );
 
-        $this->assertSame(implode('', [ $expectedA, $expectedB ]), $stdout);
+        $this->assertSame(implode('', [$expectedA, $expectedB]), $stdout);
     }
 
     #[Test]
@@ -252,8 +245,8 @@ final class ReportHandlerTest extends TestCase
         $frameIdentifiers = new InMemoryFrameIdentifiers();
         $backtrace = new Backtrace($frameIdentifiers);
 
-        $logger = new Logger('TEST');
-        $logger->pushHandler(new StreamHandler('php://output'));
+        $log = [];
+        $logger = new FakePsrLogger($log);
 
         $reporters = new InMemoryReporters();
         $reporters->add(
@@ -268,13 +261,13 @@ final class ReportHandlerTest extends TestCase
         $issues = new InMemoryIssues();
         $issues->add(
             issue: ExceptionalIssue::create(
-                exception: new Exception('Error AAA'),
+                exception: $exceptionA = new Exception('Error AAA'),
                 occuredAt: new DateTimeImmutable('2 days ago'),
             ),
         );
         $issues->add(
             issue: ExceptionalIssue::create(
-                exception: new Exception('Error BBB'),
+                exception: $exceptionB = new Exception('Error BBB'),
                 occuredAt: new DateTimeImmutable('now'),
             ),
         );
@@ -291,8 +284,22 @@ final class ReportHandlerTest extends TestCase
         preg_match_all('/Error AAA/', $stdout, $matchesA);
         preg_match_all('/Error BBB/', $stdout, $matchesB);
 
-        $this->assertCount(2, array_shift($matchesA));
-        $this->assertCount(2, array_shift($matchesB));
+        $this->assertCount(1, array_shift($matchesA));
+        $this->assertCount(1, array_shift($matchesB));
+
+        $this->assertCount(2, $log);
+        $this->assertSame([
+            [
+                'level' => 'error',
+                'message' => $exceptionA->getMessage(),
+                'context' => [],
+            ],
+            [
+                'level' => 'error',
+                'message' => $exceptionB->getMessage(),
+                'context' => [],
+            ],
+        ], $log);
     }
 
     #[Test]
@@ -338,7 +345,7 @@ final class ReportHandlerTest extends TestCase
     {
         $reporters = new InMemoryReporters();
         $reporters->add(
-            condition: new CallbackCondition(static fn () => false),
+            condition: new CallbackCondition(static fn() => false),
             reporter: new CallbackReporter(
                 function (Issue $issue) {
                     echo 'Should Not Be Reported!';

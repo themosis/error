@@ -24,9 +24,7 @@
     "repositories": [],
     "require": {
         "php": "^8.2",
-        "psr/log": "^3.0",
-        "themosis/log": "dev-main",
-        "monolog/monolog": "^3.7"
+        "psr/log": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.1"
@@ -38,6 +36,7 @@
         "analyze": "tools/phpstan/vendor/bin/phpstan analyze"
     },
     "suggest": {
-        "themosis/log": "Themosis component to help you manage PSR-3 compliant loggers."
+        "themosis/log": "Themosis component to help you manage PSR-3 compliant loggers.",
+        "monolog/monolog": "Popular PHP package to generate PSR-3 compliant loggers."
     }
 }
