@@ -294,7 +294,7 @@ An issue contains the following properties:
 - A message: the problem description text.
 - A date: when the problem occurred.
 - A level: the severity of the issue, following PSR-3 levels.
-- An exception: for PHP compatibity, the issue should be able to be converted/translated to an exception.
+- An exception: for PHP compatibility, the issue should be able to be converted/translated to an exception.
 - Information: any additional information about the issue.
 
 In most PHP applications, developers have to deal with exceptions. The package provides the `ExceptionalIssue` class that can be used to translate an exception into an issue like so:
