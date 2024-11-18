@@ -8,7 +8,7 @@ Themosis Error
 ==============
 
 The Themosis error component provides a highly configurable PHP API to manage application errors and exceptions.
-The package also provides a nice looking and color accessible interface to better help you debug your projects.
+The package also provides a nice looking and color accessible interface to better help you debug your web projects.
 
 Installation
 ------------
@@ -23,7 +23,7 @@ Features
 --------
 
 - Configurable error reporter
-- Backtrace with identifiable frames
+- Backtrace with filterable and identifiable frames
 - File preview
 - HTML error report template with light and dark themes
 - Configurable PHP error handler
@@ -43,20 +43,22 @@ The package provides 2 components to help you interact with PHP errors and excep
 Report Handler
 --------------
 
-The `ReportHandler` is the main component of the package, it acts as the aggregate that manages how you can report your application errors and exceptions.
+The `ReportHandler` is the main component of the package, it acts as an aggregate that manages how you can report your application errors and exceptions.
 
 The `ReportHandler` class requires two dependencies:
 
-1. A collection of reporters
-2. A collection of issues
+1. A repository of reporters
+2. A repository of issues
 
-A `Reporter` is an interface that represents any PHP class that can report an `Issue`. For example a reporter can report an issue to the standard output (stdout), or report the issue in a log file, or send the issue to a third-party service, ... The choice is yours. You can register as many reporters as you want. It is also possible to configure in which context a reporter should act against the given issue.
+A `Reporter` is an interface that represents any PHP class that can report an `Issue`. For example, a reporter can report an issue to the standard output (stdout), or report the issue in a log file, or send the issue to a third-party service, ... The choice is yours. You can register as many reporters as you want. It is also possible to configure in which context a reporter can act against a given issue.
 
 An `Issue` is an interface that represents an error or any custom problem in your application that you want to report.
 
-Depending on your needs, you can configure multiple report handlers withing your application. Here is a basic configuration example where we always report to the stdout:
+Depending on your needs, you can configure multiple report handlers within your application. Here is a basic configuration example where we always report to the stdout:
 
 ```php
+<?php
+
 $reporters = new InMemoryReporters();
 $reporters->add(
     condition: new AlwaysReport(),
@@ -88,13 +90,15 @@ The `InMemoryReporters` class is a repository that contains all declared reporte
 
 #### Report Condition
 
-The first required parameter is a report condition. The condition instance is reponsible to evaluate if the linked reporter must be evaluated or not. There are builtin conditions with the package: `AlwaysReport` and `CallbackCondition` but you can also build your own.
+The first required parameter is a report condition. The condition instance is reponsible to evaluate if the linked reporter must be executed or not. There are builtin conditions with the package: `AlwaysReport` and `CallbackCondition` but you can also build your own.
 
 The `AlwaysReport` condition, as its name implies, is always reporting the attached reporter.
 
-The `CallbackCondition` accepts a callback as a parameter to let you evaluate if the issue should be reported or not. The given callback has the `Issue` as an argument:
+The `CallbackCondition` accepts a callback as a parameter to let you evaluate if the issue should be reported or not. The given callback receives the `Issue` as an argument:
 
 ```php
+<?php
+
 // The following reporter will only report RuntimeException issues.
 $reporters->add(
     condition: new CallbackCondition(static function (Issue $issue) {
@@ -120,11 +124,13 @@ class TerminalCondition implements ReportCondition
 
 #### Reporter
 
-The second required parameter is a reporter instance. A reporter is one executable element attached to the report handler and it is evaluated if its related condition is true.
+The second required parameter is a reporter instance. A reporter is one executable element attached to the report handler. The reporter is executed if its related condition is true.
 
 There is a generic builtin `CallbackReporter` class provided by the package. The `CallbackReporter` accepts a function as a parameter, which receives the `Issue` as an argument:
 
 ```php
+<?php
+
 $reporters->add(
     condition: new AlwaysReport(),
     reporter: new CallbackReporter(static function (Issue $issue) {
@@ -159,6 +165,44 @@ class LogReporter implements Reporter
         );
     }
 }
+```
+
+The package also provides 2 additional reporters:
+
+1. LogReporter: automatically logs the issue to an attached PSR-3 compliant logger.
+2. StdoutReporter: prints the issue to the standard output (stdout) with backtrace in text.
+
+#### LogReporter
+
+If you project supports a PSR-3 logger, you can pass it to the `LogReporter` instance like so:
+
+```php
+<?php
+
+// Here is an example using the Monolog package.
+// The issue is always logged to a file.
+$logger = new Logger('app');
+$logger->pushHandler(new StreamHandler('/path/to/file.log'));
+
+$reporters->add(
+    condition: new AlwaysReport(),
+    reporter: new LogReporter($logger),
+);
+```
+
+#### StdoutReporter
+
+The `StdoutReporter` requires a `Backtrace` instance and will print out the issue message, the additional information and a text backtrace to `stdout`:
+
+```php
+<?php
+
+$backtrace = new Backtrace(new InMemoryFrameIdentifiers());
+
+$reporters->add(
+    condition: new AlwaysReport(),
+    reporter: new StdoutReporter($backtrace),
+);
 ```
 
 ### PHP Error Handler
