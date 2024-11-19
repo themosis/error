@@ -40,7 +40,10 @@ The package provides 2 components to help you interact with PHP errors and excep
     - [PHP Error Handler](#php-error-handler)
     - [PHP Exception Handler](#php-exception-handler)
 2. [Issue](#issue)
-3. [Backtrace](#backtrace)
+3. [Information](#information)
+    - [On Exceptions](#on-exceptions)
+    - [On Issues](#on-issues)
+4. [Backtrace](#backtrace)
 
 Report Handler
 --------------
@@ -305,7 +308,77 @@ In most PHP applications, developers have to deal with exceptions. The package p
 $issue = ExceptionalIssue::create(new RuntimeException('Oops!'));
 ```
 
-### Information
+### Custom Issue
+
+The package only provides a wrapper to handle PHP exceptions but you are free to build your own custom issue class by implementing the `Issue` interface.
+
+As a reminder, the `ReportHandler` is not hooked by default to the default PHP error and exception handlers, so you're free to report any "domain" or "logic" issues in your project by leveraging the package Issue abstraction. A project can also contain multiple `ReportHandler` instances configured to report on separate issues. For example, you can configure a ReportHandler inside a specific application context/domain. 
+
+Here is an example of a custom issue class:
+
+```php
+<?php
+
+class OrderIssue implements Issue
+{
+    public function __construct(
+        private Order $order,
+    )
+    {}
+
+    public function message(): string
+    {
+        return sprintf('Order %s could not be processed, card refused.', $this->order->id());
+    }
+
+    public function date(): IssueDate
+    {
+        return new IssueDate($this->order->checkedOutAt());
+    }
+
+    public function level(): Level
+    {
+        return Level::critical;
+    }
+
+    public function exception(): Throwable
+    {
+        return new RuntimeException('Order not processed.');
+    }
+
+    public function info(): ?InformationGroup
+    {
+        return (new InformationGroup('Order'))
+            ->add('ID', $this->order->id())
+            ->add('Card Last 4', $this->order->payment->last4())
+            ->add('Customer', $this->order->customer->name());
+    }
+}
+```
+
+The above snippet shows a very simple issue class that can be reused anywhere under the "Order" management domain perhaps...
+
+The idea of abstracting the Issue is that this information can easily be used on multiple outputs:
+
+- browser
+- command line
+- filesystem
+- remote service
+- ...
+
+Information
+-----------
+
+When reporting an issue, the default behavior is to return the error message and possibly a backtrace to help developers understand the problem.
+
+With the `themosis/error` package, we support an "Additional Information" feature to let developers pass more information and context to the issue.
+The "Information" feature can also be translated to the PSR-3 logging `context` property.
+
+The previous code snippet is showing the usage of the `InformationGroup` class on a custom issue. Additional information can be declared on an issue but it is also possible to declare additional context/information on a PHP exception class.
+
+### On Exceptions
+
+### On Issues
 
 Backtrace
 ---------
