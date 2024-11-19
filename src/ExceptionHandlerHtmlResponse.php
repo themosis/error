@@ -44,7 +44,7 @@ final class ExceptionHandlerHtmlResponse
             }, $stack);
         };
 
-        $prepareInformation($stack = $issue->stack());
+        $prepareInformation($stack = $this->getIssueStack($issue));
 
         $content(
             $this->viewPath,
@@ -201,5 +201,26 @@ final class ExceptionHandlerHtmlResponse
         );
 
         return $previewCallback(implode(PHP_EOL, $lines));
+    }
+
+    private function getIssueStack(Issue $issue): array
+    {
+        $issues = [];
+
+        return $this->getIssueFromException($issue, $issues);
+    }
+
+    private function getIssueFromException(Issue $issue, array &$issues): array
+    {
+        $issues[] = $issue;
+
+        if ($previous = $issue->exception()->getPrevious()) {
+            return $this->getIssueFromException(
+                issue: ExceptionalIssue::create($previous),
+                issues: $issues
+            );
+        }
+
+        return $issues;
     }
 }
