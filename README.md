@@ -264,8 +264,8 @@ $reporters->add(
         $information = new InMemoryInformation();
         $information->add(
             (new InformationGroup('General'))
-                ->add('PHP', phpversion())
-                ->add('OS', php_uname('s'))
+                ->add(new TextInfo('PHP', phpversion()))
+                ->add(new TextInfo('OS', php_uname('s')))
         );
 
         (new ExceptionHandlerHtmlResponse(
@@ -349,9 +349,9 @@ class OrderIssue implements Issue
     public function info(): ?InformationGroup
     {
         return (new InformationGroup('Order'))
-            ->add('ID', $this->order->id())
-            ->add('Card Last 4', $this->order->payment->last4())
-            ->add('Customer', $this->order->customer->name());
+            ->add(new TextInfo('ID', $this->order->id()))
+            ->add(new TextInfo('Card Last 4', $this->order->payment->last4()))
+            ->add(new TextInfo('Customer', $this->order->customer->name()));
     }
 }
 ```
@@ -378,7 +378,52 @@ The previous code snippet is showing the usage of the `InformationGroup` class o
 
 ### On Exceptions
 
+If you're hooking the [ReportHandler as the default PHP exception handler](#php-exception-handler), you can declare additional information on any PHP exception class and get it rendered by the `ExceptionHandlerHtmlResponse` class (default) but also by any configured reporters.
+
+You can attach additional information on an exception class by implementing the `AdditionalInformation` interface and declare the `information()` method that should return an `InformationGroup` instance. The information group acts as a "collection" where you can pass any number of values. On the information group, you can call and chain the `add()` method which expects an `Info` instance to handler the passed value (the package comes with a simple `TextInfo` class for strings):
+
+```php
+<?php
+
+class OrderFailed extends RuntimeException implements AdditionalInformation
+{
+    public function __construct(
+        private Order $order,
+        private Throwable $previous = null,
+    )
+    {
+        parent::__construct('Order failed.', 0, $previous);
+    }
+     
+    public function information(): InformationGroup
+    {
+        return (new InformationGroup('Order'))
+            ->add(new TextInfo('Order #', $this->order->id()))
+            ->add(new TextInfo('Transaction #', $this->order->transaction->id()));
+    }
+}
+```
+
 ### On Issues
+
+When building a custom issue class, the `Issue` interface lets you declare additional information and context by implementing the `info()` method. The difference here is that this is optional.
+
+```php
+<?php
+
+class OrderIssue implements Issue
+{
+    // ...
+
+    public function info(): ?InformationGroup
+    {
+        return (new InformationGroup('Order'))
+            ->add(new TextInfo('Order #', $this->order->id()));
+    }
+}
+```
+
+Final output for an issue and its additional information will eventually endup as a "string" value. The package provides a default `TextInfo()` class to handle string info. Each info must have a "name" (first parameter) and a corresponding "value" (second parameter). Thanks to the `Info` interface, you are free to implement custom ways to "serialize" complex data structure for usage under an issue and how it will look as a string value.
 
 Backtrace
 ---------
