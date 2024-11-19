@@ -423,7 +423,7 @@ class OrderIssue implements Issue
 }
 ```
 
-Final output for an issue and its additional information will eventually endup as a "string" value. The package provides a default `TextInfo()` class to handle string info. Each info must have a "name" (first parameter) and a corresponding "value" (second parameter). Thanks to the `Info` interface, you are free to implement custom ways to "serialize" complex data structure for usage under an issue and how it will look as a string value.
+Final output for an issue and its additional information will eventually end up as a "string" value. The package provides a default `TextInfo()` class to handle string info. Each info must have a "name" (first parameter) and a corresponding "value" (second parameter). Thanks to the `Info` interface, you are free to implement custom ways to "serialize" complex data structure for usage under an issue and how it will look as a string value.
 
 Backtrace
 ---------
