@@ -30,6 +30,19 @@ Features
 - Configurable PHP error handler
 - Configurable PHP exception handler
 
+Example
+-------
+
+You can quickly try the example provided within the package by cloning the repository and run the PHP built-in web server:
+
+```bash
+git clone https://github.com/themosis/error.git
+cd error/example
+php -S localhost:8000
+```
+
+The `example` directory shows a code sample with a configured report handler hooked as the default PHP exception handler. The example code throws multiple exceptions and render them in the browser using the default HTML template. Feel free to explore!
+
 Introduction
 ------------
 
@@ -44,6 +57,10 @@ The package provides 2 components to help you interact with PHP errors and excep
     - [On Exceptions](#on-exceptions)
     - [On Issues](#on-issues)
 4. [Backtrace](#backtrace)
+    - [Capture Frames](#capture-frames)
+    - [Get Frames](#get-frames)
+    - [Tag Frames](#tag-frames)
+    - [Filter Frames](#filter-frames)
 
 Report Handler
 --------------
@@ -427,3 +444,62 @@ Final output for an issue and its additional information will eventually end up 
 
 Backtrace
 ---------
+
+The `themosis/error` package also comes with a `Backtrace` class to let you easily manipulate the PHP debug backtrace frames using an object-oriented interface.
+
+The `Backtrace` class can be used to capture frames from the [debug_backtrace()](https://www.php.net/debug_backtrace) function or frames coming from an exception.
+
+Besides capturing debug frames, the `Backtrace` class can also filter out and tag frames. For example, you might want to remove all the frames belonging to files stored in the `vendor` directory. You might also want to tag (label) frames that belong to a specific domain, ...
+
+> Our HTML error template support all features of the backtrace class and is able to show tagged frames in the browser.
+
+### Capture Frames
+
+The default behavior of the `Backtrace` class is to capture debug frames. The simplest version is by using the static `debug()` method like so:
+
+```php
+<?php
+
+$backtrace = Backtrace::debug();
+```
+
+The above code snippet is capturing the debug frames from the file where it is currently invoked. Just like the `debug_backtrace()` PHP function, the `Backtrace` class is not printing to the stdout the captured frames.
+
+The `Backtrace` class implements the `Stringable` interface, so you can just "echo" a backtrace instance to stdout:
+
+```php
+<?php
+
+$backtrace = Backtrace::debug();
+
+echo $backtace;
+```
+
+It also implements the magic `__debugInfo()` method so you dump the frames when passed to the `var_dump()` function:
+
+```php
+<?php
+
+$backtrace = Backtrace::debug();
+
+var_dump($backtrace);
+```
+
+#### Capture Frames Manually
+
+#### Capture Exception Frames
+
+### Get Frames
+
+You can access the frames by calling the `frames()` method on a backtrace instance:
+
+```php
+<?php
+
+$backtrace = Backtrace::debug();
+
+$frames = $backtrace->frames();
+```
+### Tag Frames
+
+### Filter Frames
