@@ -37,6 +37,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             --color-red-800: hsl(342, 38%, 25%);
             --color-red-900: hsl(323, 36%, 20%);
 
+            --color-yellow-300: rgb(255, 244, 200);
             --color-yellow-500: rgb(255, 226, 115);
 
             --space-none: 0;
@@ -219,12 +220,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
         .line {
             display: inline-block;
             width: 100%;
-            background: var(--color-gray-300);
+            background: var(--color-gray-100);
             line-height: 1.625;
         }
 
         .line:nth-of-type(even) {
-            background: var(--color-white);
+            background: var(--color-gray-100);
         }
 
         .line:hover {
@@ -233,7 +234,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
         .current-line,
         .line.current-line {
-            background: var(--color-yellow-500);
+            background: var(--color-yellow-300);
         }
 
         .line-number {
@@ -245,7 +246,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             -webkit-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            border-right: 1px solid var(--color-blue-500);
+            border-right: 1px solid var(--color-blue-400);
             text-align: right;
         }
 
@@ -372,6 +373,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
         }
 
         @media screen and (min-width: 1024px) {
+	    :root {
+		--sidebar-width: 128px;
+            }
+
             body {
                 margin: var(--space-md);
             }
@@ -469,7 +474,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             }
 
             .line:nth-of-type(even) {
-                background: var(--color-blue-900);
+                background: var(--color-blue-800);
             }
 
             .line:hover {
@@ -478,7 +483,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
             .current-line,
             .line.current-line {
-                background: var(--color-yellow-500);
+                background: var(--color-yellow-300);
             }
 
             .line-number {
@@ -521,7 +526,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
             .frame .current-line,
             .frame .line.current-line {
-                background: var(--color-yellow-500);
+                background: var(--color-yellow-300);
             }
 
             .frame .current-line .line-number, 
