@@ -374,7 +374,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
         @media screen and (min-width: 1024px) {
 	    :root {
-		--sidebar-width: 128px;
+		--sidebar-width: 96px;
             }
 
             body {
