@@ -39,6 +39,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
             --color-yellow-300: rgb(255, 244, 200);
             --color-yellow-500: rgb(255, 226, 115);
+            --color-yellow-700: rgb(255, 214, 50);
 
             --space-none: 0;
             --space-xs: 0.25rem;
@@ -483,7 +484,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
             .current-line,
             .line.current-line {
-                background: var(--color-yellow-300);
+                background: var(--color-yellow-700);
             }
 
             .line-number {
@@ -517,7 +518,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
             }
 
             .frame .line {
-                background: var(--color-blue-900);
+                background: var(--color-blue-800);
             }
 
             .frame .line:nth-of-type(even) {
@@ -526,7 +527,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
             .frame .current-line,
             .frame .line.current-line {
-                background: var(--color-yellow-300);
+                background: var(--color-yellow-700);
             }
 
             .frame .current-line .line-number, 
