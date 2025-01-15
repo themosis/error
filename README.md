@@ -494,7 +494,7 @@ $backtrace = new Backtrace(
     frame_identifiers: new InMemoryFrameIdentifiers(),
 );
 
-$backtrace->capture(debug_backtrace(true));
+$backtrace->capture(debug_backtrace());
 ```
 
 #### Capture Exception Frames
