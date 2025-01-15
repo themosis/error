@@ -487,6 +487,16 @@ var_dump($backtrace);
 
 #### Capture Frames Manually
 
+You can build a custom backtrace instance and manually pass an array of frames to the `capture()` method:
+
+```php
+$backtrace = new Backtrace(
+    frame_identifiers: new InMemoryFrameIdentifiers(),
+);
+
+$backtrace->capture(debug_backtrace(true));
+```
+
 #### Capture Exception Frames
 
 ### Get Frames
