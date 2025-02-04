@@ -43,8 +43,8 @@ php -S localhost:8000
 
 The `example` directory shows a code sample with a configured report handler hooked as the default PHP exception handler. The example code throws multiple exceptions and render them in the browser using the default HTML template. Feel free to explore!
 
-Introduction
-------------
+Usage
+------
 
 The package provides 2 components to help you interact with PHP errors and exceptions:
 
@@ -52,11 +52,11 @@ The package provides 2 components to help you interact with PHP errors and excep
     - [Reporters](#reporters)
     - [PHP Error Handler](#php-error-handler)
     - [PHP Exception Handler](#php-exception-handler)
-2. [Issue](#issue)
-3. [Information](#information)
+	- [Issue](#issue)
+    - [Information](#information)
     - [On Exceptions](#on-exceptions)
     - [On Issues](#on-issues)
-4. [Backtrace](#backtrace)
+2. [Backtrace](#backtrace)
     - [Capture Frames](#capture-frames)
     - [Get Frames](#get-frames)
     - [Tag Frames](#tag-frames)
@@ -304,8 +304,7 @@ The above code snippet is attaching a `ReportHandler` to replace the default PHP
 
 > The attached condition is to always report the issue to the stdout. On your application, make sure to constraint the condition to avoid rendering the error HTML template on a production environment.
 
-Issue
------
+### Issue
 
 An `Issue` is the package abstract definition for any problem that could occur inside a PHP application. The `ReportHandler` is never directly dealing with a PHP error nor a PHP exception but with an `Issue` instance.
 
@@ -325,7 +324,7 @@ In most PHP applications, developers have to deal with exceptions. The package p
 $issue = ExceptionalIssue::create(new RuntimeException('Oops!'));
 ```
 
-### Custom Issue
+#### Custom Issue
 
 The package only provides a wrapper to handle PHP exceptions but you are free to build your own custom issue class by implementing the `Issue` interface.
 
@@ -383,8 +382,7 @@ The idea of abstracting the Issue is that this information can easily be used on
 - remote service
 - ...
 
-Information
------------
+### Information
 
 When reporting an issue, the default behavior is to return the error message and possibly a backtrace to help developers understand the problem.
 
@@ -393,7 +391,7 @@ The "Information" feature can also be translated to the PSR-3 logging `context` 
 
 The previous code snippet is showing the usage of the `InformationGroup` class on a custom issue. Additional information can be declared on an issue but it is also possible to declare additional context/information on a PHP exception class.
 
-### On Exceptions
+#### On Exceptions
 
 If you're hooking the [ReportHandler as the default PHP exception handler](#php-exception-handler), you can declare additional information on any PHP exception class and get it rendered by the `ExceptionHandlerHtmlResponse` class (default) but also by any configured reporters.
 
@@ -421,7 +419,7 @@ class OrderFailed extends RuntimeException implements AdditionalInformation
 }
 ```
 
-### On Issues
+#### On Issues
 
 When building a custom issue class, the `Issue` interface lets you declare additional information and context by implementing the `info()` method. The difference here is that this is optional.
 
