@@ -639,16 +639,16 @@ $identifiers->add(
 
 // Apply built-in AppFrameTag on frames coming from the "app" directory.
 $identifiers->add(
-	identifier: new CustomFrameIdentifier(
-		tag: new AppFrameTag(),
-		identifier: function (Frame $frame) {
-			return str_contains($frame->getFile()->path, 'app');
-		},
-	),
+    identifier: new CustomFrameIdentifier(
+        tag: new AppFrameTag(),
+        identifier: function (Frame $frame) {
+            return str_contains($frame->getFile()->path, 'app');
+        },
+    ),
 );
 
 $backtrace = new Backtrace(
-	frameIdentifiers: $identifiers,
+    frameIdentifiers: $identifiers,
 );
 ```
 
@@ -672,15 +672,15 @@ Here is an exaple on how to use the filter method:
 <?php
 
 $backtrace = new Backtrace(
-	frameIdentifiers: new InMemoryIdentifiers(),
+    frameIdentifiers: new InMemoryIdentifiers(),
 );
 
 $appBacktrace = $backtrace->filter(function (Frame $frame) {
-	if ($frame->getFunction() instanceof ClassFunction) {
-		return $frame->getFunction()->getClass() === '\Core\Application';
-	}
+    if ($frame->getFunction() instanceof ClassFunction) {
+        return $frame->getFunction()->getClass() === '\Core\Application';
+    }
 	
-	return false;
+    return false;
 });
 ```
 
