@@ -632,9 +632,9 @@ $identifiers = new InMemoryFrameIdentifiers();
 
 // Tag vendor frames using built-in class.
 $identifiers->add(
-	identifier: new VendorFrameIdentifier(
-		projectRootPath: dirname(__DIR__, 2),
-	),
+    identifier: new VendorFrameIdentifier(
+        projectRootPath: dirname(__DIR__, 2),
+    ),
 );
 
 // Apply built-in AppFrameTag on frames coming from the "app" directory.
