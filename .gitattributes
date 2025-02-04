@@ -1,0 +1,9 @@
+/coverage	export-ignore
+/example	export-ignore
+/tests		export-ignore
+/tools		export-ignore
+phpcs.xml.dist	export-ignore
+phpstan.neon.*	export-ignore
+phpunit.xml	export-ignore
+
+*.php		diff=php
