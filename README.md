@@ -610,9 +610,9 @@ one you can leverage to define your own identifiers:
 <?php
 
 $identifier = new CustomFrameIdentifier(
-	tag: new CustomFrameTag('library', 'Library'),
-	identifier: function (Frame $frame) {
-		return str_contains($frame->getFile()->path(), 'lib');
+    tag: new CustomFrameTag('library', 'Library'),
+    identifier: function (Frame $frame) {
+        return str_contains($frame->getFile()->path(), 'lib');
 	},
 );
 ```
